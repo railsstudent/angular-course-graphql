@@ -1,29 +1,31 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable } from '@apollo/client/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { AllCoursesGQL, Course } from '../../generated/graphql';
-import { tap, takeUntil, map } from 'rxjs/operators';
+import { takeUntil, map } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
 
 @Component({
   selector: 'app-course-list',
   templateUrl: './course-list.component.html',
-  styleUrls: ['./course-list.component.scss']
+  styleUrls: ['./course-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CourseListComponent implements OnInit, OnDestroy {
   courses: Course[] | undefined | null = [];
   destroy$ = new Subject<boolean>();
 
-  constructor(private allCoursesGQL: AllCoursesGQL) { }
+  constructor(private allCoursesGQL: AllCoursesGQL, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    console.log('CourseListComponent ngOnInit');
     this.allCoursesGQL.watch({}, { pollInterval: 500 })
       .valueChanges
       .pipe(
         map(({ data }) => data.courses),
         takeUntil(this.destroy$)
-      ).subscribe(courses => this.courses = courses);
+      ).subscribe(courses => {
+        this.courses = courses;
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnDestroy(): void {

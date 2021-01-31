@@ -1,0 +1,20 @@
+<div class="container">
+  <div class="header">
+    <div class="back">
+      <button [routerLink]="['/courses']">Back</button>
+    </div>
+    <div class="course-summary">
+      <p>{{ course?.name }}</p>
+    </div>
+    <div class="spacer"></div>
+  </div>
+  <p>My Lessons</p>
+  <div class="lessons" *ngIf="lessons && lessons.length > 0 else noLesson">
+    <div class="lesson" *ngFor="let lesson of lessons">
+      <a [routerLink]="[ '/lesson', { id: lesson.id } ]">{{ lesson.name }}</a>
+    </div>
+  </div>
+</div>
+<ng-template #noLesson>
+  No lesson
+</ng-template>

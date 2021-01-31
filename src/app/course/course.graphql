@@ -11,20 +11,32 @@ query AllCourses {
   }
 }
 
-
 query Course ($courseId: String!, $args: PaginationArgs!) {
   course(id: $courseId) {
     id
     name
-    description
-    language {
-      id
-      name
-      nativeName
-    }
     lessons (args: $args) {
       id
       name
+    }
+  }
+}
+
+query Lesson ($lessonId: String!)  {
+  lesson(id: $lessonId) {
+    id
+    name
+    course {
+      id
+      name
+    }
+    sentences {
+      id
+      text
+      translations {
+        id
+        text
+      }
     }
   }
 }

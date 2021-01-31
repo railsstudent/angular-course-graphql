@@ -231,13 +231,34 @@ export type CourseQuery = (
   { __typename?: 'Query' }
   & { course?: Maybe<(
     { __typename?: 'Course' }
-    & Pick<Course, 'id' | 'name' | 'description'>
-    & { language?: Maybe<(
-      { __typename?: 'Language' }
-      & Pick<Language, 'id' | 'name' | 'nativeName'>
-    )>, lessons?: Maybe<Array<(
+    & Pick<Course, 'id' | 'name'>
+    & { lessons?: Maybe<Array<(
       { __typename?: 'Lesson' }
       & Pick<Lesson, 'id' | 'name'>
+    )>> }
+  )> }
+);
+
+export type LessonQueryVariables = Exact<{
+  lessonId: Scalars['String'];
+}>;
+
+
+export type LessonQuery = (
+  { __typename?: 'Query' }
+  & { lesson?: Maybe<(
+    { __typename?: 'Lesson' }
+    & Pick<Lesson, 'id' | 'name'>
+    & { course?: Maybe<(
+      { __typename?: 'Course' }
+      & Pick<Course, 'id' | 'name'>
+    )>, sentences?: Maybe<Array<(
+      { __typename?: 'Sentence' }
+      & Pick<Sentence, 'id' | 'text'>
+      & { translations?: Maybe<Array<(
+        { __typename?: 'Translation' }
+        & Pick<Translation, 'id' | 'text'>
+      )>> }
     )>> }
   )> }
 );
@@ -267,18 +288,11 @@ export class AllCoursesGQL extends Apollo.Query<AllCoursesQuery, AllCoursesQuery
     super(apollo);
   }
 }
-
 export const CourseDocument = gql`
     query Course($courseId: String!, $args: PaginationArgs!) {
   course(id: $courseId) {
     id
     name
-    description
-    language {
-      id
-      name
-      nativeName
-    }
     lessons(args: $args) {
       id
       name
@@ -292,6 +306,37 @@ export const CourseDocument = gql`
 })
 export class CourseGQL extends Apollo.Query<CourseQuery, CourseQueryVariables> {
   document = CourseDocument;
+
+  constructor(apollo: Apollo.Apollo) {
+    super(apollo);
+  }
+}
+export const LessonDocument = gql`
+    query Lesson($lessonId: String!) {
+  lesson(id: $lessonId) {
+    id
+    name
+    course {
+      id
+      name
+    }
+    sentences {
+      id
+      text
+      translations {
+        id
+        text
+      }
+    }
+  }
+}
+    `;
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LessonGQL extends Apollo.Query<LessonQuery, LessonQueryVariables> {
+  document = LessonDocument;
 
   constructor(apollo: Apollo.Apollo) {
     super(apollo);
