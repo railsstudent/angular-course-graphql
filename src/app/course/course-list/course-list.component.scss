@@ -1,0 +1,18 @@
+:host {
+  display: block;
+}
+
+.course{
+  &-container {
+    padding: 0.5rem;
+
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &-card {
+    margin: 0.5rem;
+
+    flex-basis: 0 1 25%;
+  }
+}

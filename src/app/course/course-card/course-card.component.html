@@ -1,0 +1,14 @@
+<div class="course">
+  <p>
+    <span>Name: </span><span>{{ course?.name }}</span>
+  </p>
+  <p>
+    <span>Description: </span><span>{{ course?.description }}</span>
+  </p>
+  <p>
+    <span>Language: </span><span>{{ course?.language?.name }} ({{ course?.language?.nativeName }})</span>
+  </p>
+  <p class="actions">
+    <button class="course-button" (click)="viewLesson()">See Lessons</button>
+  </p>
+</div>
