@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  graphqlUrl: 'http://localhost:3000/graphql'
+  graphqlUrl: 'http://localhost:3000/graphql',
+  pollingInterval: 1 * 1000 * 60 * 30,
 };
 
 /*

@@ -4,9 +4,10 @@ import { CourseListComponent } from './course-list/course-list.component';
 import { CourseRoutingModule } from './course-routing.module';
 import { CourseCardComponent } from './course-card/course-card.component';
 import { LessonsComponent } from './lessons/lessons.component';
+import { LessonComponent } from './lesson/lesson.component';
 
 @NgModule({
-  declarations: [CourseListComponent, CourseCardComponent, LessonsComponent],
+  declarations: [CourseListComponent, CourseCardComponent, LessonsComponent, LessonComponent],
   imports: [
     CommonModule,
     CourseRoutingModule,

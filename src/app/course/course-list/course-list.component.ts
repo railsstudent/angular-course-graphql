@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnIni
 import { AllCoursesGQL, Course } from '../../generated/graphql';
 import { takeUntil, map } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -17,7 +18,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   constructor(private allCoursesGQL: AllCoursesGQL, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    this.allCoursesGQL.watch({}, { pollInterval: 500 })
+    this.allCoursesGQL.watch({}, { pollInterval: environment.pollingInterval })
       .valueChanges
       .pipe(
         map(({ data }) => data.courses),

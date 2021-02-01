@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnIni
 import { ActivatedRoute } from '@angular/router';
 import { EMPTY, Subject } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 import { Course, CourseGQL, Lesson } from '../../generated/graphql';
 
 @Component({
@@ -31,7 +32,7 @@ export class LessonsComponent implements OnInit, OnDestroy {
             courseId,
             args
           }, {
-            pollInterval: 500,
+            pollInterval: environment.pollingInterval
           })
           .valueChanges;
         }

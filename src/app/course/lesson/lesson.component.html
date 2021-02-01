@@ -1,0 +1,21 @@
+<div class="container">
+  <div class="header">
+    <div class="back">
+      <button [routerLink]="['../']">Back</button>
+    </div>
+    <div class="course-summary">
+      <p>{{ lesson?.course?.name }}</p>
+      <p>{{ lesson?.name }}</p>
+    </div>
+    <div class="spacer"></div>
+  </div>
+  <p>Sentences</p>
+  <div class="sentences" *ngIf="lesson && lesson.sentences && lesson.sentences.length > 0 else noSentence">
+    <div class="sentence" *ngFor="let sentence of lesson.sentences">
+      <p>{{ sentence.text }}</p>
+    </div>
+  </div>
+</div>
+<ng-template #noSentence>
+  No sentence found in this lesson
+</ng-template>
