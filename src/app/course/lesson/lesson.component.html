@@ -13,6 +13,11 @@
   <div class="sentences" *ngIf="lesson && lesson.sentences && lesson.sentences.length > 0 else noSentence">
     <div class="sentence" *ngFor="let sentence of lesson.sentences">
       <p>{{ sentence.text }}</p>
+      <div class="translations">
+        <div class="translation" *ngFor="let translation of sentence.translations">
+          translation: {{ translation.text }}
+        </div>
+      </div>
     </div>
   </div>
 </div>
