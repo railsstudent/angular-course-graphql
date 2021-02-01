@@ -258,6 +258,10 @@ export type LessonQuery = (
       & { translations?: Maybe<Array<(
         { __typename?: 'Translation' }
         & Pick<Translation, 'id' | 'text'>
+        & { language?: Maybe<(
+          { __typename?: 'Language' }
+          & Pick<Language, 'id' | 'name'>
+        )> }
       )>> }
     )>> }
   )> }
@@ -326,6 +330,10 @@ export const LessonDocument = gql`
       translations {
         id
         text
+        language {
+          id
+          name
+        }
       }
     }
   }

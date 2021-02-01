@@ -13,9 +13,16 @@
   <div class="sentences" *ngIf="lesson && lesson.sentences && lesson.sentences.length > 0 else noSentence">
     <div class="sentence" *ngFor="let sentence of lesson.sentences">
       <p>{{ sentence.text }}</p>
-      <div class="translations">
-        <div class="translation" *ngFor="let translation of sentence.translations">
-          translation: {{ translation.text }}
+      <div class="translations" *ngIf="sentence && sentence.translations && sentence.translations.length > 0">
+        <div class="actions">
+          <span class="available">Available translations:</span>
+          <button class="translation" *ngFor="let translation of sentence.translations"
+            (click)="showTranslation(sentence, translation)">
+            {{ translation?.language?.name }}
+          </button>
+        </div>
+        <div *ngIf="selectedTranslation && selectedSentence?.id === sentence.id">
+          Translation: {{ selectedTranslation?.text }}
         </div>
       </div>
     </div>

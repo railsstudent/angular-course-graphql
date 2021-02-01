@@ -8,4 +8,18 @@
     display: flex;
     justify-content: space-between;
   }
+
+  .sentence {
+    padding: 1rem;
+  }
+
+  .translations {
+    .actions {
+      display: flex;
+
+      .available, button.translation {
+        margin-right: 0.25rem;
+      }
+    }
+  }
 }
