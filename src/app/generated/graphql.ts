@@ -145,6 +145,7 @@ export type Query = {
   courses?: Maybe<Array<Course>>;
   getLanguages: Array<Language>;
   getSentence: Sentence;
+  getTranslation: Translation;
   lesson?: Maybe<Lesson>;
 };
 
@@ -159,6 +160,12 @@ export type QueryGetSentenceArgs = {
 };
 
 
+export type QueryGetTranslationArgs = {
+  languageId: Scalars['String'];
+  sentenceId: Scalars['String'];
+};
+
+
 export type QueryLessonArgs = {
   id?: Maybe<Scalars['String']>;
 };
@@ -166,6 +173,7 @@ export type QueryLessonArgs = {
 /** Sentence model */
 export type Sentence = {
   __typename?: 'Sentence';
+  availableTranslations?: Maybe<Array<Language>>;
   id: Scalars['ID'];
   lesson?: Maybe<Lesson>;
   text?: Maybe<Scalars['String']>;
@@ -255,16 +263,26 @@ export type LessonQuery = (
     )>, sentences?: Maybe<Array<(
       { __typename?: 'Sentence' }
       & Pick<Sentence, 'id' | 'text'>
-      & { translations?: Maybe<Array<(
-        { __typename?: 'Translation' }
-        & Pick<Translation, 'id' | 'text'>
-        & { language?: Maybe<(
-          { __typename?: 'Language' }
-          & Pick<Language, 'id' | 'name'>
-        )> }
+      & { availableTranslations?: Maybe<Array<(
+        { __typename?: 'Language' }
+        & Pick<Language, 'id' | 'name'>
       )>> }
     )>> }
   )> }
+);
+
+export type TranslationQueryVariables = Exact<{
+  sentenceId: Scalars['String'];
+  languageId: Scalars['String'];
+}>;
+
+
+export type TranslationQuery = (
+  { __typename?: 'Query' }
+  & { getTranslation: (
+    { __typename?: 'Translation' }
+    & Pick<Translation, 'id' | 'text'>
+  ) }
 );
 
 export const AllCoursesDocument = gql`
@@ -316,35 +334,50 @@ export class CourseGQL extends Apollo.Query<CourseQuery, CourseQueryVariables> {
   }
 }
 export const LessonDocument = gql`
-    query Lesson($lessonId: String!) {
-  lesson(id: $lessonId) {
+  query Lesson($lessonId: String!) {
+lesson(id: $lessonId) {
+  id
+  name
+  course {
     id
     name
-    course {
+  }
+  sentences {
+    id
+    text
+    availableTranslations {
       id
       name
     }
-    sentences {
-      id
-      text
-      translations {
-        id
-        text
-        language {
-          id
-          name
-        }
-      }
-    }
   }
 }
-    `;
+}
+  `;
 
 @Injectable({
   providedIn: 'root'
 })
 export class LessonGQL extends Apollo.Query<LessonQuery, LessonQueryVariables> {
   document = LessonDocument;
+
+  constructor(apollo: Apollo.Apollo) {
+    super(apollo);
+  }
+}
+export const TranslationDocument = gql`
+  query Translation($sentenceId: String!, $languageId: String!) {
+getTranslation(sentenceId: $sentenceId, languageId: $languageId) {
+  id
+  text
+}
+}
+  `;
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TranslationGQL extends Apollo.Query<TranslationQuery, TranslationQueryVariables> {
+  document = TranslationDocument;
 
   constructor(apollo: Apollo.Apollo) {
     super(apollo);

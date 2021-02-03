@@ -33,14 +33,17 @@ query Lesson ($lessonId: String!)  {
     sentences {
       id
       text
-      translations {
+      availableTranslations {
         id
-        text
-        language {
-          id
-          name
-        }
+        name
       }
     }
+  }
+}
+
+query Translation($sentenceId: String!, $languageId: String!) {
+  getTranslation(sentenceId: $sentenceId, languageId: $languageId) {
+    id
+    text
   }
 }

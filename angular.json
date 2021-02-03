@@ -20,6 +20,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "graphql-tag"
+            ],
             "outputPath": "dist/angular-course-graphql",
             "index": "src/index.html",
             "main": "src/main.ts",
