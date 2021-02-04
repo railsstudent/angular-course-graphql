@@ -35,6 +35,6 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   trackByFunc(index: number, course: Course) {
-    return course.id
+    return course.id;
   }
 }

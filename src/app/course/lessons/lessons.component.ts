@@ -52,7 +52,7 @@ export class LessonsComponent implements OnInit, OnDestroy {
     this.destroy$.unsubscribe();
   }
 
-  trackByFunc(index: number, lesson: Lesson) {
-    return lesson.id
+  trackByFunc(index: number, lesson: Lesson): string {
+    return lesson.id;
   }
 }

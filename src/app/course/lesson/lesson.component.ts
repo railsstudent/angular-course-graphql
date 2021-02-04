@@ -19,7 +19,10 @@ export class LessonComponent implements OnInit, OnDestroy {
   lesson: Lesson | null | undefined = undefined;
   selectedTranslation: Translation | undefined = undefined;
 
-  constructor(private route: ActivatedRoute, private lessonGQL: LessonGQL, private translationGQL: TranslationGQL, private cdr: ChangeDetectorRef) { }
+  constructor(private route: ActivatedRoute,
+              private lessonGQL: LessonGQL,
+              private translationGQL: TranslationGQL,
+              private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.route.paramMap.pipe(
@@ -56,7 +59,7 @@ export class LessonComponent implements OnInit, OnDestroy {
       ).subscribe(translation => {
         this.selectedTranslation = translation;
         this.cdr.markForCheck();
-      })
+      });
   }
 
   showTranslation(sentence: Sentence, availableTranslation: Language): void {
@@ -69,7 +72,7 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.destroy$.unsubscribe();
   }
 
-  trackByFunc(index: number, sentence: Sentence) {
-    return sentence.id
+  trackByFunc(index: number, sentence: Sentence): string {
+    return sentence.id;
   }
 }
