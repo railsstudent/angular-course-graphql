@@ -68,4 +68,8 @@ export class LessonComponent implements OnInit, OnDestroy {
     this.destroy$.next(true);
     this.destroy$.unsubscribe();
   }
+
+  trackByFunc(index: number, sentence: Sentence) {
+    return sentence.id
+  }
 }

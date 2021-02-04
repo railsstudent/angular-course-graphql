@@ -33,4 +33,8 @@ export class CourseListComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.unsubscribe();
   }
+
+  trackByFunc(index: number, course: Course) {
+    return course.id
+  }
 }

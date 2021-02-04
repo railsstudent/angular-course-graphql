@@ -10,7 +10,7 @@
   </div>
   <p>My Lessons</p>
   <div class="lessons" *ngIf="lessons && lessons.length > 0 else noLesson">
-    <div class="lesson" *ngFor="let lesson of lessons">
+    <div class="lesson" *ngFor="let lesson of lessons; trackBy:trackByFunc">
       <a [routerLink]="[ lesson.id ]">{{ lesson.name }}</a>
     </div>
   </div>
