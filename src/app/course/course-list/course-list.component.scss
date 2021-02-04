@@ -2,9 +2,12 @@
   display: block;
 }
 
+.container {
+  padding: 0.5rem;
+}
+
 .course{
   &-container {
-    padding: 0.5rem;
 
     display: flex;
     flex-wrap: wrap;

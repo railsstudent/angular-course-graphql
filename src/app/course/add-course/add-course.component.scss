@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.add-course {
+  padding: 0.5rem;
+  border: 1px solid #4a4a4a;
+
+  form {
+    display: flex;
+    flex-direction: column;
+
+    > label {
+      margin: 0.5rem;
+      span {
+        margin-right: 0.5rem;
+      }
+    }
+
+    button {
+      align-self: start;
+      margin: 0.5rem;
+    }
+  }
+}

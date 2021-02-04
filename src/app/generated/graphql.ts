@@ -285,6 +285,17 @@ export type TranslationQuery = (
   ) }
 );
 
+export type LanguagesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LanguagesQuery = (
+  { __typename?: 'Query' }
+  & { getLanguages: Array<(
+    { __typename?: 'Language' }
+    & Pick<Language, 'id' | 'name' | 'nativeName'>
+  )> }
+);
+
 export const AllCoursesDocument = gql`
     query AllCourses {
   courses {
@@ -334,25 +345,25 @@ export class CourseGQL extends Apollo.Query<CourseQuery, CourseQueryVariables> {
   }
 }
 export const LessonDocument = gql`
-  query Lesson($lessonId: String!) {
-lesson(id: $lessonId) {
-  id
-  name
-  course {
+    query Lesson($lessonId: String!) {
+  lesson(id: $lessonId) {
     id
     name
-  }
-  sentences {
-    id
-    text
-    availableTranslations {
+    course {
       id
       name
     }
+    sentences {
+      id
+      text
+      availableTranslations {
+        id
+        name
+      }
+    }
   }
 }
-}
-  `;
+    `;
 
 @Injectable({
   providedIn: 'root'
@@ -365,13 +376,13 @@ export class LessonGQL extends Apollo.Query<LessonQuery, LessonQueryVariables> {
   }
 }
 export const TranslationDocument = gql`
-  query Translation($sentenceId: String!, $languageId: String!) {
-getTranslation(sentenceId: $sentenceId, languageId: $languageId) {
-  id
-  text
+    query Translation($sentenceId: String!, $languageId: String!) {
+  getTranslation(sentenceId: $sentenceId, languageId: $languageId) {
+    id
+    text
+  }
 }
-}
-  `;
+    `;
 
 @Injectable({
   providedIn: 'root'
@@ -383,3 +394,23 @@ export class TranslationGQL extends Apollo.Query<TranslationQuery, TranslationQu
     super(apollo);
   }
 }
+export const LanguagesDocument = gql`
+    query Languages {
+  getLanguages {
+    id
+    name
+    nativeName
+  }
+}
+    `;
+
+@Injectable({
+    providedIn: 'root'
+  })
+  export class LanguagesGQL extends Apollo.Query<LanguagesQuery, LanguagesQueryVariables> {
+    document = LanguagesDocument;
+
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }

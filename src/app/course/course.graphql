@@ -47,3 +47,11 @@ query Translation($sentenceId: String!, $languageId: String!) {
     text
   }
 }
+
+query Languages {
+  getLanguages {
+    id
+    name
+    nativeName
+  }
+}

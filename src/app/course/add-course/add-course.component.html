@@ -1,0 +1,23 @@
+<div class="add-course">
+  <p>New Course</p>
+  <form [formGroup]="form" novalidate (ngSubmit)="onSubmit($event)">
+    <label>
+      <span>Name:</span>
+      <input type="text" formControlName="name" required maxlength="50" size="50">
+    </label>
+    <label>
+      <span>Description:</span>
+      <input type="text" formControlName="description" required maxlength="150" size="100">
+    </label>
+    <label>
+      <span>Language:</span>
+      <select formControlName="languageId" style="min-width: 100px;">
+        <option [value]="language.id" *ngFor="let language of languages">{{ language.name}}({{ language.nativeName }})</option>
+      </select>
+    </label>
+    <button [disabled]="!form.valid">Add</button>
+    <pre>
+      {{ form.value | json }}
+    </pre>
+  </form>
+</div>

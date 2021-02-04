@@ -1,6 +1,9 @@
-<div class="course-container" *ngIf="courses else noCourse">
-  <div *ngFor="let course of courses; trackBy:trackByFunc">
-    <app-course-card class="course-card" [course]="course"></app-course-card>
+<div class="container">
+  <app-add-course [languages]="languages" (submitNewCourse)="submitNewCourse($event)"></app-add-course>
+  <div class="course-container" *ngIf="courses else noCourse">
+    <div *ngFor="let course of courses; trackBy:trackByFunc">
+      <app-course-card class="course-card" [course]="course"></app-course-card>
+    </div>
   </div>
 </div>
 <ng-template #noCourse>
