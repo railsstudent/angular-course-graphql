@@ -1,9 +1,8 @@
 import { NewCourseInput } from './../type';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { AllCoursesGQL, Course, Language, LanguagesGQL } from '../../generated/graphql';
-import { takeUntil, map, switchMap } from 'rxjs/operators';
+import { Course, Language } from '../../generated/graphql';
+import { switchMap } from 'rxjs/operators';
 import { EMPTY, Subject } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { CourseService } from '../services/course.service';
 
 @Component({
@@ -17,28 +16,18 @@ export class CourseListComponent implements OnInit, OnDestroy {
   destroy$ = new Subject<boolean>();
   languages: Language[] = [];
 
-  constructor(private allCoursesGQL: AllCoursesGQL,
-              private languagesGQL: LanguagesGQL,
-              private service: CourseService,
+  constructor(private service: CourseService,
               private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    this.allCoursesGQL.watch({}, { pollInterval: environment.pollingInterval })
-      .valueChanges
-      .pipe(
-        map(({ data }) => data.courses),
-        takeUntil(this.destroy$)
-      ).subscribe(courses => {
+    this.service.getAllCourses()
+      .subscribe((courses: Course[]) => {
         this.courses = courses;
         this.cdr.markForCheck();
       });
 
-    this.languagesGQL.watch({})
-      .valueChanges
-      .pipe(
-        map(({ data }) => data.getLanguages),
-        takeUntil(this.destroy$)
-      ).subscribe(languages => {
+    this.service.getLanguages()
+      .subscribe((languages: Language[]) => {
         this.languages = languages;
         this.cdr.markForCheck();
       });

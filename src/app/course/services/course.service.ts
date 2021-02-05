@@ -1,7 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { of, Subject } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
-import { AllCoursesGQL, LanguagesGQL, AddCourseGQL } from '../../generated/graphql';
+import { environment } from 'src/environments/environment';
+import { AllCoursesGQL, LanguagesGQL, AddCourseGQL, Course } from '../../generated/graphql';
 import { NewCourseInput } from '../type';
 
 @Injectable({
@@ -33,6 +34,19 @@ export class CourseService implements OnDestroy {
       .valueChanges
       .pipe(
         map(({ data }) => data.getLanguages),
+        takeUntil(this.destroy$)
+      );
+  }
+
+  getAllCourses(): any {
+    return this.allCoursesGQL.watch({}, { pollInterval: environment.pollingInterval })
+      .valueChanges
+      .pipe(
+        map(({ data }) => data.courses),
+        catchError(err => {
+          console.error(err);
+          return of([] as Course[]);
+        }),
         takeUntil(this.destroy$)
       );
   }
