@@ -55,3 +55,16 @@ query Languages {
     nativeName
   }
 }
+
+mutation addCourse ($newCourse: AddCourseInput!) {
+  addCourse(newCourse: $newCourse) {
+   	id
+  	name
+    description,
+    language {
+      id
+      name
+      nativeName
+    }
+  }
+}

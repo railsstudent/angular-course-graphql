@@ -296,6 +296,23 @@ export type LanguagesQuery = (
   )> }
 );
 
+export type AddCourseMutationVariables = Exact<{
+  newCourse: AddCourseInput;
+}>;
+
+
+export type AddCourseMutation = (
+  { __typename?: 'Mutation' }
+  & { addCourse: (
+    { __typename?: 'Course' }
+    & Pick<Course, 'id' | 'name' | 'description'>
+    & { language?: Maybe<(
+      { __typename?: 'Language' }
+      & Pick<Language, 'id' | 'name' | 'nativeName'>
+    )> }
+  ) }
+);
+
 export const AllCoursesDocument = gql`
     query AllCourses {
   courses {
@@ -312,15 +329,15 @@ export const AllCoursesDocument = gql`
     `;
 
 @Injectable({
-  providedIn: 'root'
-})
-export class AllCoursesGQL extends Apollo.Query<AllCoursesQuery, AllCoursesQueryVariables> {
-  document = AllCoursesDocument;
+    providedIn: 'root'
+  })
+  export class AllCoursesGQL extends Apollo.Query<AllCoursesQuery, AllCoursesQueryVariables> {
+    document = AllCoursesDocument;
 
-  constructor(apollo: Apollo.Apollo) {
-    super(apollo);
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
   }
-}
 export const CourseDocument = gql`
     query Course($courseId: String!, $args: PaginationArgs!) {
   course(id: $courseId) {
@@ -335,15 +352,15 @@ export const CourseDocument = gql`
     `;
 
 @Injectable({
-  providedIn: 'root'
-})
-export class CourseGQL extends Apollo.Query<CourseQuery, CourseQueryVariables> {
-  document = CourseDocument;
+    providedIn: 'root'
+  })
+  export class CourseGQL extends Apollo.Query<CourseQuery, CourseQueryVariables> {
+    document = CourseDocument;
 
-  constructor(apollo: Apollo.Apollo) {
-    super(apollo);
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
   }
-}
 export const LessonDocument = gql`
     query Lesson($lessonId: String!) {
   lesson(id: $lessonId) {
@@ -366,15 +383,15 @@ export const LessonDocument = gql`
     `;
 
 @Injectable({
-  providedIn: 'root'
-})
-export class LessonGQL extends Apollo.Query<LessonQuery, LessonQueryVariables> {
-  document = LessonDocument;
+    providedIn: 'root'
+  })
+  export class LessonGQL extends Apollo.Query<LessonQuery, LessonQueryVariables> {
+    document = LessonDocument;
 
-  constructor(apollo: Apollo.Apollo) {
-    super(apollo);
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
   }
-}
 export const TranslationDocument = gql`
     query Translation($sentenceId: String!, $languageId: String!) {
   getTranslation(sentenceId: $sentenceId, languageId: $languageId) {
@@ -385,15 +402,15 @@ export const TranslationDocument = gql`
     `;
 
 @Injectable({
-  providedIn: 'root'
-})
-export class TranslationGQL extends Apollo.Query<TranslationQuery, TranslationQueryVariables> {
-  document = TranslationDocument;
+    providedIn: 'root'
+  })
+  export class TranslationGQL extends Apollo.Query<TranslationQuery, TranslationQueryVariables> {
+    document = TranslationDocument;
 
-  constructor(apollo: Apollo.Apollo) {
-    super(apollo);
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
   }
-}
 export const LanguagesDocument = gql`
     query Languages {
   getLanguages {
@@ -409,6 +426,31 @@ export const LanguagesDocument = gql`
   })
   export class LanguagesGQL extends Apollo.Query<LanguagesQuery, LanguagesQueryVariables> {
     document = LanguagesDocument;
+
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const AddCourseDocument = gql`
+    mutation addCourse($newCourse: AddCourseInput!) {
+  addCourse(newCourse: $newCourse) {
+    id
+    name
+    description
+    language {
+      id
+      name
+      nativeName
+    }
+  }
+}
+    `;
+
+@Injectable({
+    providedIn: 'root'
+  })
+  export class AddCourseGQL extends Apollo.Mutation<AddCourseMutation, AddCourseMutationVariables> {
+    document = AddCourseDocument;
 
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
