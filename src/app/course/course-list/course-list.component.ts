@@ -1,9 +1,10 @@
 import { NewCourseInput } from './../type';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { AllCoursesGQL, Course, AddCourseGQL, Language, LanguagesGQL } from '../../generated/graphql';
-import { takeUntil, map, catchError } from 'rxjs/operators';
+import { AllCoursesGQL, Course, Language, LanguagesGQL } from '../../generated/graphql';
+import { takeUntil, map, switchMap } from 'rxjs/operators';
 import { EMPTY, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { CourseService } from '../services/course.service';
 
 @Component({
   selector: 'app-course-list',
@@ -18,7 +19,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
 
   constructor(private allCoursesGQL: AllCoursesGQL,
               private languagesGQL: LanguagesGQL,
-              private addCourseGQL: AddCourseGQL,
+              private service: CourseService,
               private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
@@ -53,22 +54,20 @@ export class CourseListComponent implements OnInit, OnDestroy {
   }
 
   submitNewCourse(newCourse: NewCourseInput): void {
-    this.addCourseGQL.mutate({
-      newCourse
-    })
+    this.service.addCourse(newCourse)
     .pipe(
-      catchError(err => {
-        console.error(err);
-        alert(err?.message || 'Add course error');
-        return EMPTY;
-      }),
-      takeUntil(this.destroy$)
-    )
-    .subscribe(({ data }) => {
-      const { addCourse } = data || {};
+      switchMap((result: any) => {
+        if (typeof result === 'string') {
+          alert(result);
+          return EMPTY;
+        }
+        return result;
+    }))
+    .subscribe((addCourse: Course | undefined | null) => {
       if (addCourse) {
         this.courses = this.courses ? [...this.courses, addCourse] : [addCourse];
         this.cdr.markForCheck();
+        alert(`${addCourse.name} is added.`);
       }
     });
   }
