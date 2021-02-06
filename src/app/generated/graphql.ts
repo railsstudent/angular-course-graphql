@@ -303,7 +303,7 @@ export type LessonQuery = (
 );
 
 export type AddLessonMutationVariables = Exact<{
-  newCourse: AddLessonInput;
+  newLesson: AddLessonInput;
 }>;
 
 
@@ -459,8 +459,8 @@ export const LessonDocument = gql`
     }
   }
 export const AddLessonDocument = gql`
-    mutation addLesson($newCourse: AddLessonInput!) {
-  addLesson(newLesson: $newCourse) {
+    mutation addLesson($newLesson: AddLessonInput!) {
+  addLesson(newLesson: $newLesson) {
     id
     name
   }

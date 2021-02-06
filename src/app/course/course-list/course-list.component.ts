@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnIni
 import { Course, Language } from '../../generated/graphql';
 import { switchMap } from 'rxjs/operators';
 import { EMPTY, Subject } from 'rxjs';
-import { CourseService } from '../services/course.service';
+import { CourseService } from '../services';
 
 @Component({
   selector: 'app-course-list',

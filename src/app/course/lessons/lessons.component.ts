@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { EMPTY, of, Subject } from 'rxjs';
-import { map, switchMap, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { Course, Lesson } from '../../generated/graphql';
-import { CourseService } from '../services';
+import { NewLessonInput } from './../type';
+import { CourseService, LessonService } from '../services';
 
 @Component({
   selector: 'app-lessons',
@@ -16,7 +17,10 @@ export class LessonsComponent implements OnInit, OnDestroy {
   course: Course | undefined | null = undefined;
   lessons: Lesson[] | undefined | null = undefined;
 
-  constructor(private route: ActivatedRoute, private service: CourseService, private cdr: ChangeDetectorRef) { }
+  constructor(private route: ActivatedRoute,
+              private courseService: CourseService,
+              private lessonService: LessonService,
+              private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     const args = {
@@ -27,7 +31,7 @@ export class LessonsComponent implements OnInit, OnDestroy {
     this.route.paramMap.pipe(
       switchMap(params => {
         const courseId = params.get('id');
-        return courseId ? this.service.getCourse(courseId) : undefined;
+        return courseId ? this.courseService.getCourse(courseId) : undefined;
       }),
       takeUntil(this.destroy$)
     ).subscribe((course: any) => {
@@ -46,8 +50,20 @@ export class LessonsComponent implements OnInit, OnDestroy {
     return lesson.id;
   }
 
-  submitNewLesson(input: { name: string }): void {
+  submitNewLesson(input: NewLessonInput): void {
     const { name } = input;
-    console.log(input);
+    if (this.course) {
+      this.lessonService.addLesson({
+        name,
+        courseId: this.course.id
+      })
+      .subscribe((addLesson: Lesson) => {
+        if (addLesson) {
+          this.lessons = this.lessons ? [...this.lessons, addLesson] : [addLesson];
+          this.cdr.markForCheck();
+          alert(`${addLesson.name} is added.`);
+        }
+      }, (err: Error) => alert(err));
+    }
   }
 }

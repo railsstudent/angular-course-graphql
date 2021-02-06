@@ -1,6 +1,7 @@
 import { Language } from './../../generated/graphql';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { NewLessonInput } from '../type';
 
 @Component({
   selector: 'app-add-lesson',
@@ -13,7 +14,7 @@ export class AddLessonComponent implements OnInit {
   language: Language | undefined | null = undefined;
 
   @Output()
-  submitNewLesson = new EventEmitter<{ name: string }>();
+  submitNewLesson = new EventEmitter<NewLessonInput>();
 
   form: FormGroup = new FormGroup({});
 

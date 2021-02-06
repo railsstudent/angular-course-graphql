@@ -3,3 +3,7 @@ export type NewCourseInput = {
   description: string;
   languageId: string;
 };
+
+export type NewLessonInput = {
+  name: string;
+};

@@ -17,9 +17,9 @@ query Lesson ($lessonId: String!)  {
   }
 }
 
-mutation addLesson($newCourse: AddLessonInput!) {
+mutation addLesson($newLesson: AddLessonInput!) {
   addLesson(
-    newLesson: $newCourse
+    newLesson: $newLesson
   ) {
     id
     name
