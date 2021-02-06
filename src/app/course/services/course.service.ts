@@ -1,9 +1,11 @@
+import { CourseGQL } from './../../generated/graphql';
 import { Injectable, OnDestroy } from '@angular/core';
-import { of, Subject } from 'rxjs';
-import { catchError, map, takeUntil } from 'rxjs/operators';
+import { of, Subject, throwError } from 'rxjs';
+import { catchError, map, takeUntil, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { AllCoursesGQL, LanguagesGQL, AddCourseGQL, Course } from '../../generated/graphql';
 import { NewCourseInput } from '../type';
+import { AnyMxRecord } from 'dns';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +15,7 @@ export class CourseService implements OnDestroy {
 
   constructor(private allCoursesGQL: AllCoursesGQL,
               private languagesGQL: LanguagesGQL,
+              private courseGQL: CourseGQL,
               private addCourseGQL: AddCourseGQL, ) { }
 
   /* TODO: optimistic updates */
@@ -22,6 +25,25 @@ export class CourseService implements OnDestroy {
     })
     .pipe(
       map(({ data }) => data?.addCourse),
+    );
+  }
+
+  getCourse(courseId: string): any {
+    const args = {
+      offset: 0,
+      limit: 100,
+    };
+
+    return this.courseGQL.watch({
+      courseId,
+      args
+    }, {
+      pollInterval: environment.pollingInterval
+    })
+    .valueChanges
+    .pipe(
+      map(({ data }) => data.course),
+      takeUntil(this.destroy$)
     );
   }
 

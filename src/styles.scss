@@ -10,3 +10,21 @@ body {
   min-height: 100vh;
   height: 100%;
 }
+
+
+button {
+  padding: 8px 18px;
+  border-radius: 0.5rem;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+input {
+  padding: 0.5rem;
+}
+
+p.title {
+  font-size: 1.2rem;
+}

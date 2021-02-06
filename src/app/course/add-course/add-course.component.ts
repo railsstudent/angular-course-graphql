@@ -16,7 +16,7 @@ export class AddCourseComponent implements OnInit, OnChanges {
   @Output()
   submitNewCourse = new EventEmitter<NewCourseInput>();
 
-  form: FormGroup = new FormGroup({});
+  form = new FormGroup({});
 
   constructor(private fb: FormBuilder) { }
 

@@ -6,16 +6,31 @@
   padding: 0.5rem;
 }
 
-.course{
-  &-container {
-
+.course {
+  &-list {
     display: flex;
     flex-wrap: wrap;
+  }
+
+  &-container {
+    flex: 1 1 calc(100% / 4);
   }
 
   &-card {
     margin: 0.5rem;
 
     flex-basis: 0 1 25%;
+  }
+}
+
+@media only screen  and (max-width: 767px) {
+  .course-container {
+    flex-basis: calc(100% / 3);
+  }
+}
+
+@media only screen  and (max-width: 640px) {
+  .course-container {
+    flex-basis: 50%;
   }
 }

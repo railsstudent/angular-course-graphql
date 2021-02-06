@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { EMPTY, Subject } from 'rxjs';
+import { EMPTY, of, Subject } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
-import { environment } from 'src/environments/environment';
-import { Course, CourseGQL, Lesson } from '../../generated/graphql';
+import { Course, Lesson } from '../../generated/graphql';
+import { CourseService } from '../services';
 
 @Component({
   selector: 'app-lessons',
@@ -16,7 +16,7 @@ export class LessonsComponent implements OnInit, OnDestroy {
   course: Course | undefined | null = undefined;
   lessons: Lesson[] | undefined | null = undefined;
 
-  constructor(private route: ActivatedRoute, private courseGQL: CourseGQL, private cdr: ChangeDetectorRef) { }
+  constructor(private route: ActivatedRoute, private service: CourseService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     const args = {
@@ -27,24 +27,14 @@ export class LessonsComponent implements OnInit, OnDestroy {
     this.route.paramMap.pipe(
       switchMap(params => {
         const courseId = params.get('id');
-        if (courseId) {
-          return this.courseGQL.watch({
-            courseId,
-            args
-          }, {
-            pollInterval: environment.pollingInterval
-          })
-          .valueChanges;
-        }
-        return EMPTY;
+        return courseId ? this.service.getCourse(courseId) : undefined;
       }),
-      map(({ data }) => data.course),
       takeUntil(this.destroy$)
-    ).subscribe(course => {
+    ).subscribe((course: any) => {
       this.course = course;
       this.lessons = course?.lessons;
       this.cdr.markForCheck();
-    });
+    }, (err: Error) => alert(err));
   }
 
   ngOnDestroy(): void {
@@ -54,5 +44,10 @@ export class LessonsComponent implements OnInit, OnDestroy {
 
   trackByFunc(index: number, lesson: Lesson): string {
     return lesson.id;
+  }
+
+  submitNewLesson(input: { name: string }): void {
+    const { name } = input;
+    console.log(input);
   }
 }
