@@ -12,7 +12,7 @@
     <label>
       <span>Language:</span>
       <select formControlName="languageId" style="min-width: 100px;">
-        <option [value]="language.id" *ngFor="let language of languages">{{ language.name}}({{ language.nativeName }})</option>
+        <option [value]="language.id" *ngFor="let language of languages">{{ language.name}} ({{ language.nativeName }})</option>
       </select>
     </label>
     <button [disabled]="!form.valid">Add</button>

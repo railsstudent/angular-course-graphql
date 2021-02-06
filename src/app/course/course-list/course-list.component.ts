@@ -44,20 +44,12 @@ export class CourseListComponent implements OnInit, OnDestroy {
 
   submitNewCourse(newCourse: NewCourseInput): void {
     this.service.addCourse(newCourse)
-    .pipe(
-      switchMap((result: any) => {
-        if (typeof result === 'string') {
-          alert(result);
-          return EMPTY;
-        }
-        return result;
-    }))
     .subscribe((addCourse: Course | undefined | null) => {
       if (addCourse) {
         this.courses = this.courses ? [...this.courses, addCourse] : [addCourse];
         this.cdr.markForCheck();
         alert(`${addCourse.name} is added.`);
       }
-    });
+    }, (err: Error) => alert(err));
   }
 }

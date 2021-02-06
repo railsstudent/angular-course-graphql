@@ -22,32 +22,6 @@ query Course ($courseId: String!, $args: PaginationArgs!) {
   }
 }
 
-query Lesson ($lessonId: String!)  {
-  lesson(id: $lessonId) {
-    id
-    name
-    course {
-      id
-      name
-    }
-    sentences {
-      id
-      text
-      availableTranslations {
-        id
-        name
-      }
-    }
-  }
-}
-
-query Translation($sentenceId: String!, $languageId: String!) {
-  getTranslation(sentenceId: $sentenceId, languageId: $languageId) {
-    id
-    text
-  }
-}
-
 query Languages {
   getLanguages {
     id

@@ -247,6 +247,34 @@ export type CourseQuery = (
   )> }
 );
 
+export type LanguagesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LanguagesQuery = (
+  { __typename?: 'Query' }
+  & { getLanguages: Array<(
+    { __typename?: 'Language' }
+    & Pick<Language, 'id' | 'name' | 'nativeName'>
+  )> }
+);
+
+export type AddCourseMutationVariables = Exact<{
+  newCourse: AddCourseInput;
+}>;
+
+
+export type AddCourseMutation = (
+  { __typename?: 'Mutation' }
+  & { addCourse: (
+    { __typename?: 'Course' }
+    & Pick<Course, 'id' | 'name' | 'description'>
+    & { language?: Maybe<(
+      { __typename?: 'Language' }
+      & Pick<Language, 'id' | 'name' | 'nativeName'>
+    )> }
+  ) }
+);
+
 export type LessonQueryVariables = Exact<{
   lessonId: Scalars['String'];
 }>;
@@ -282,34 +310,6 @@ export type TranslationQuery = (
   & { getTranslation: (
     { __typename?: 'Translation' }
     & Pick<Translation, 'id' | 'text'>
-  ) }
-);
-
-export type LanguagesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type LanguagesQuery = (
-  { __typename?: 'Query' }
-  & { getLanguages: Array<(
-    { __typename?: 'Language' }
-    & Pick<Language, 'id' | 'name' | 'nativeName'>
-  )> }
-);
-
-export type AddCourseMutationVariables = Exact<{
-  newCourse: AddCourseInput;
-}>;
-
-
-export type AddCourseMutation = (
-  { __typename?: 'Mutation' }
-  & { addCourse: (
-    { __typename?: 'Course' }
-    & Pick<Course, 'id' | 'name' | 'description'>
-    & { language?: Maybe<(
-      { __typename?: 'Language' }
-      & Pick<Language, 'id' | 'name' | 'nativeName'>
-    )> }
   ) }
 );
 
@@ -361,6 +361,51 @@ export const CourseDocument = gql`
       super(apollo);
     }
   }
+export const LanguagesDocument = gql`
+    query Languages {
+  getLanguages {
+    id
+    name
+    nativeName
+  }
+}
+    `;
+
+@Injectable({
+    providedIn: 'root'
+  })
+  export class LanguagesGQL extends Apollo.Query<LanguagesQuery, LanguagesQueryVariables> {
+    document = LanguagesDocument;
+
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const AddCourseDocument = gql`
+    mutation addCourse($newCourse: AddCourseInput!) {
+  addCourse(newCourse: $newCourse) {
+    id
+    name
+    description
+    language {
+      id
+      name
+      nativeName
+    }
+  }
+}
+    `;
+
+@Injectable({
+    providedIn: 'root'
+  })
+  export class AddCourseGQL extends Apollo.Mutation<AddCourseMutation, AddCourseMutationVariables> {
+    document = AddCourseDocument;
+
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
 export const LessonDocument = gql`
     query Lesson($lessonId: String!) {
   lesson(id: $lessonId) {
@@ -406,51 +451,6 @@ export const TranslationDocument = gql`
   })
   export class TranslationGQL extends Apollo.Query<TranslationQuery, TranslationQueryVariables> {
     document = TranslationDocument;
-
-    constructor(apollo: Apollo.Apollo) {
-      super(apollo);
-    }
-  }
-export const LanguagesDocument = gql`
-    query Languages {
-  getLanguages {
-    id
-    name
-    nativeName
-  }
-}
-    `;
-
-@Injectable({
-    providedIn: 'root'
-  })
-  export class LanguagesGQL extends Apollo.Query<LanguagesQuery, LanguagesQueryVariables> {
-    document = LanguagesDocument;
-
-    constructor(apollo: Apollo.Apollo) {
-      super(apollo);
-    }
-  }
-export const AddCourseDocument = gql`
-    mutation addCourse($newCourse: AddCourseInput!) {
-  addCourse(newCourse: $newCourse) {
-    id
-    name
-    description
-    language {
-      id
-      name
-      nativeName
-    }
-  }
-}
-    `;
-
-@Injectable({
-    providedIn: 'root'
-  })
-  export class AddCourseGQL extends Apollo.Mutation<AddCourseMutation, AddCourseMutationVariables> {
-    document = AddCourseDocument;
 
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

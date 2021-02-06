@@ -15,17 +15,13 @@ export class CourseService implements OnDestroy {
               private languagesGQL: LanguagesGQL,
               private addCourseGQL: AddCourseGQL, ) { }
 
+  /* TODO: optimistic updates */
   addCourse(newCourse: NewCourseInput): any {
     return this.addCourseGQL.mutate({
       newCourse
     })
     .pipe(
-      map(({ data }) => of(data?.addCourse)),
-      catchError(err => {
-        console.error(err);
-        return of(err?.message || 'Add course error');
-      }),
-
+      map(({ data }) => data?.addCourse),
     );
   }
 
