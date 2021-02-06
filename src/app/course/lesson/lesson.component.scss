@@ -4,9 +4,16 @@
 
 .container {
   .header {
+    min-height: 70px;
     padding: 0.5rem;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #4a4a4a;
+
+    .lesson {
+      font-size: 1.5rem;
+    }
   }
 
   .sentence {

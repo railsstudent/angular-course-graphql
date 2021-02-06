@@ -1,9 +1,10 @@
+import { SentenceService } from './../services/sentence.service';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, EMPTY, Subject } from 'rxjs';
-import { map, startWith, switchMap, takeUntil } from 'rxjs/operators';
-import { environment } from 'src/environments/environment';
-import { LessonGQL, Lesson, Translation, Sentence, Language, TranslationGQL } from '../../generated/graphql';
+import { switchMap, takeUntil } from 'rxjs/operators';
+import { Lesson, Translation, Sentence, Language } from '../../generated/graphql';
+import { LessonService } from '../services';
 
 @Component({
   selector: 'app-lesson',
@@ -20,46 +21,31 @@ export class LessonComponent implements OnInit, OnDestroy {
   selectedTranslation: Translation | undefined = undefined;
 
   constructor(private route: ActivatedRoute,
-              private lessonGQL: LessonGQL,
-              private translationGQL: TranslationGQL,
+              private lessonService: LessonService,
+              private sentenceService: SentenceService,
               private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.route.paramMap.pipe(
       switchMap(params => {
         const lessonId = params.get('lessonId');
-        if (lessonId) {
-          return this.lessonGQL.watch({
-            lessonId,
-          }, {
-            pollInterval: environment.pollingInterval
-          })
-          .valueChanges;
-        }
-        return EMPTY;
+        return lessonId ? this.lessonService.getLesson(lessonId) : EMPTY;
       }),
-      map(({ data }) => data.lesson),
-      takeUntil(this.destroy$)
-    ).subscribe(lesson => {
-      this.lesson = lesson;
+    ).subscribe((lesson: any) => {
+      this.lesson = lesson as Lesson;
       this.cdr.markForCheck();
-    });
+    }, (err) => alert(err));
 
     combineLatest([this.sentence$, this.translationLangauge$])
       .pipe(
         switchMap(([sentenceId, languageId]) =>
-          this.translationGQL.watch({
-            sentenceId,
-            languageId
-          }, {}).valueChanges
+          this.sentenceService.getTranslation(sentenceId, languageId)
         ),
-        map(({ data }) => data.getTranslation),
-        startWith(undefined),
         takeUntil(this.destroy$)
-      ).subscribe(translation => {
-        this.selectedTranslation = translation;
+      ).subscribe((translation: any) => {
+        this.selectedTranslation = translation as Translation;
         this.cdr.markForCheck();
-      });
+      }, (err) => alert(err));
   }
 
   showTranslation(sentence: Sentence, availableTranslation: Language): void {

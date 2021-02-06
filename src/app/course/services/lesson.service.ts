@@ -1,9 +1,9 @@
+import { LessonGQL } from './../../generated/graphql';
 import { Injectable, OnDestroy } from '@angular/core';
-import { Subject, of } from 'rxjs';
+import { Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { AddLessonGQL, AddLessonInput } from 'src/app/generated/graphql';
 import { environment } from 'src/environments/environment';
-import { NewLessonInput } from '../type';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ import { NewLessonInput } from '../type';
 export class LessonService implements OnDestroy {
   private destroy$ = new Subject<boolean>();
 
-  constructor(private addLessonGQL: AddLessonGQL) { }
+  constructor(private addLessonGQL: AddLessonGQL, private lessonGQL: LessonGQL) { }
 
   /* TODO: optimistic updates */
   addLesson(newLesson: AddLessonInput): any {
@@ -20,6 +20,19 @@ export class LessonService implements OnDestroy {
     })
     .pipe(
       map(({ data }) => data?.addLesson),
+    );
+  }
+
+  getLesson(lessonId: string): any {
+    return this.lessonGQL.watch({
+      lessonId,
+    }, {
+      pollInterval: environment.pollingInterval
+    })
+    .valueChanges
+    .pipe(
+      map(({ data }) => data.lesson),
+      takeUntil(this.destroy$)
     );
   }
 

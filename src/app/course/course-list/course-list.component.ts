@@ -1,8 +1,6 @@
 import { NewCourseInput } from './../type';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Course, Language } from '../../generated/graphql';
-import { switchMap } from 'rxjs/operators';
-import { EMPTY, Subject } from 'rxjs';
 import { CourseService } from '../services';
 
 @Component({
@@ -11,9 +9,8 @@ import { CourseService } from '../services';
   styleUrls: ['./course-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CourseListComponent implements OnInit, OnDestroy {
+export class CourseListComponent implements OnInit {
   courses: Course[] | undefined | null = [];
-  destroy$ = new Subject<boolean>();
   languages: Language[] = [];
 
   constructor(private service: CourseService,
@@ -31,11 +28,6 @@ export class CourseListComponent implements OnInit, OnDestroy {
         this.languages = languages;
         this.cdr.markForCheck();
       });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.unsubscribe();
   }
 
   trackByFunc(index: number, course: Course): string {

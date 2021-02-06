@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subject } from 'rxjs';
-import { switchMap, takeUntil } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { Course, Lesson } from '../../generated/graphql';
 import { NewLessonInput } from './../type';
 import { CourseService, LessonService } from '../services';
@@ -12,8 +11,7 @@ import { CourseService, LessonService } from '../services';
   styleUrls: ['./lessons.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LessonsComponent implements OnInit, OnDestroy {
-  destroy$ = new Subject<boolean>();
+export class LessonsComponent implements OnInit {
   course: Course | undefined | null = undefined;
   lessons: Lesson[] | undefined | null = undefined;
 
@@ -33,17 +31,11 @@ export class LessonsComponent implements OnInit, OnDestroy {
         const courseId = params.get('id');
         return courseId ? this.courseService.getCourse(courseId) : undefined;
       }),
-      takeUntil(this.destroy$)
     ).subscribe((course: any) => {
-      this.course = course;
-      this.lessons = course?.lessons;
+      this.course = course as Course;
+      this.lessons = course?.lessons || [];
       this.cdr.markForCheck();
     }, (err: Error) => alert(err));
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.unsubscribe();
   }
 
   trackByFunc(index: number, lesson: Lesson): string {
