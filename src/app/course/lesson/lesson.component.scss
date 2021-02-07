@@ -16,17 +16,43 @@
     }
   }
 
-  .sentence {
+  .main {
     padding: 1rem;
+
+    p {
+      &.title {
+        margin-bottom: 1rem;
+      }
+    }
+  }
+
+  .sentence {
+    padding: 0.5rem 1rem 0.5rem 0;
+
+    .text {
+      margin-bottom: 0.5rem;
+    }
   }
 
   .translations {
     .actions {
       display: flex;
 
-      .available, button.translation {
-        margin-right: 0.25rem;
+      .available {
+        margin-right: 0.75rem;
+      }
+
+      .btn-translation {
+        margin-right: 0.5rem;
       }
     }
+  }
+
+
+  .translation {
+    border: 1px dashed green;
+    padding: 0.25rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 }
