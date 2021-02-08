@@ -1,14 +1,17 @@
-<div class="add-lesson">
-  <p class="title">New Lesson</p>
-  <!-- <form [formGroup]="form" novalidate (ngSubmit)="onSubmit($event)">
-    <label>
-      <span>Name:</span>
-      <input name="name" type="text" formControlName="name" required maxlength="50" size="50">
-    </label>
+<div class="add-sentence">
+  <p class="title">New Sentence</p>
+  <form [formGroup]="form" novalidate (ngSubmit)="onSubmit($event)">
     <label>
       <span>Language:</span>
       <span>{{ language?.name }} ({{ language?.nativeName }})</span>
     </label>
+    <label>
+      <span>Text:</span>
+      <input name="text" type="text" formControlName="text" required maxlength="1000" size="50">
+    </label>
     <button [disabled]="!form.valid">Add</button>
-  </form> -->
+  </form>
+  <pre>
+    {{ form.value | json }}
+  </pre>
 </div>

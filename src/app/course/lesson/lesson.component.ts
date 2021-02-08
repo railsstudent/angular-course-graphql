@@ -16,14 +16,15 @@ export class LessonComponent implements OnInit, OnDestroy {
   destroy$ = new Subject<boolean>();
   sentence$ = new Subject<string>();
   translationLangauge$ = new Subject<string>();
-
   lesson: Lesson | null | undefined = undefined;
   selectedTranslation: Translation | undefined = undefined;
+  language: Language | undefined = undefined;
 
   constructor(private route: ActivatedRoute,
               private lessonService: LessonService,
               private sentenceService: SentenceService,
-              private cdr: ChangeDetectorRef) { }
+              private cdr: ChangeDetectorRef) {
+  }
 
   ngOnInit(): void {
     this.route.paramMap.pipe(

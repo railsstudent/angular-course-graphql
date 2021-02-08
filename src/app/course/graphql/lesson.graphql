@@ -5,6 +5,11 @@ query Lesson ($lessonId: String!)  {
     course {
       id
       name
+      language {
+        id
+        name
+        nativeName
+      }
     }
     sentences {
       id
@@ -24,6 +29,10 @@ mutation addLesson($newLesson: AddLessonInput!) {
     id
     name
   }
+}
+
+mutation addSentence($newSentence: AddSentenceInput!) {
+
 }
 
 query Translation($sentenceId: String!, $languageId: String!) {

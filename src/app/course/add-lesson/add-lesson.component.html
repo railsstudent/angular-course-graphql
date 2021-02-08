@@ -2,12 +2,12 @@
   <p class="title">New Lesson</p>
   <form [formGroup]="form" novalidate (ngSubmit)="onSubmit($event)">
     <label>
-      <span>Name:</span>
-      <input name="name" type="text" formControlName="name" required maxlength="50" size="50">
-    </label>
-    <label>
       <span>Language:</span>
       <span>{{ language?.name }} ({{ language?.nativeName }})</span>
+    </label>
+    <label>
+      <span>Name:</span>
+      <input name="name" type="text" formControlName="name" required maxlength="50" size="50">
     </label>
     <button [disabled]="!form.valid">Add</button>
   </form>

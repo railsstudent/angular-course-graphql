@@ -21,11 +21,6 @@ export class LessonsComponent implements OnInit {
               private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    const args = {
-      offset: 0,
-      limit: 10,
-    };
-
     this.route.paramMap.pipe(
       switchMap(params => {
         const courseId = params.get('id');

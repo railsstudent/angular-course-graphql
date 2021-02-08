@@ -33,6 +33,6 @@ export class AddLessonComponent implements OnInit {
     if (!this.form.valid) {
       return;
     }
-    this.submitNewLesson.emit({ name: this.form.value.name });
+    this.submitNewLesson.emit(this.form.value.name);
   }
 }

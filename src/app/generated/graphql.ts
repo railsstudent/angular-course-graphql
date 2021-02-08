@@ -291,6 +291,10 @@ export type LessonQuery = (
     & { course?: Maybe<(
       { __typename?: 'Course' }
       & Pick<Course, 'id' | 'name'>
+      & { language?: Maybe<(
+        { __typename?: 'Language' }
+        & Pick<Language, 'id' | 'name' | 'nativeName'>
+      )> }
     )>, sentences?: Maybe<Array<(
       { __typename?: 'Sentence' }
       & Pick<Sentence, 'id' | 'text'>
@@ -435,6 +439,11 @@ export const LessonDocument = gql`
     course {
       id
       name
+      language {
+        id
+        name
+        nativeName
+      }
     }
     sentences {
       id

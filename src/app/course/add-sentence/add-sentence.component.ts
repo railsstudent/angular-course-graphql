@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Language } from '../../generated/graphql';
 
 @Component({
   selector: 'app-add-sentence',
@@ -7,11 +8,20 @@ import { FormBuilder, FormGroup } from '@angular/forms';
   styleUrls: ['./add-sentence.component.scss']
 })
 export class AddSentenceComponent implements OnInit {
+  @Input()
+  language: Language | undefined | null = undefined;
+
+  @Output()
+  submitNewSentence = new EventEmitter<{ text: string }>();
+
   form = new FormGroup({});
 
   constructor(private fb: FormBuilder) { }
 
   ngOnInit(): void {
+    this.form = this.fb.group({
+      text: new FormControl('', { validators: [Validators.required, Validators.maxLength(1000)], updateOn: 'blur' }),
+    });
   }
 
   onSubmit($event: Event): void {
@@ -21,6 +31,6 @@ export class AddSentenceComponent implements OnInit {
     if (!this.form.valid) {
       return;
     }
-    // this.submitNewLesson.emit({ name: this.form.value.name });
+    this.submitNewSentence.emit(this.form.value);
   }
 }
