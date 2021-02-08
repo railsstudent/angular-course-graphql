@@ -9,6 +9,7 @@ import { LessonComponent } from './lesson/lesson.component';
 import { AddCourseComponent } from './add-course/add-course.component';
 import { AddLessonComponent } from './add-lesson/add-lesson.component';
 import { AddSentenceComponent } from './add-sentence/add-sentence.component';
+import { AddTranslationComponent } from './add-translation/add-translation.component';
 
 @NgModule({
   declarations: [CourseListComponent,
@@ -17,7 +18,8 @@ import { AddSentenceComponent } from './add-sentence/add-sentence.component';
     LessonComponent,
     AddCourseComponent,
     AddLessonComponent,
-    AddSentenceComponent],
+    AddSentenceComponent,
+    AddTranslationComponent],
   imports: [
     CommonModule,
     CourseRoutingModule,
