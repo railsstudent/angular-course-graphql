@@ -1,10 +1,10 @@
-import { SentenceService } from './../services/sentence.service';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, EMPTY, Subject } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import { Lesson, Translation, Sentence, Language } from '../../generated/graphql';
-import { LessonService } from '../services';
+import { LessonService, SentenceService } from '../services';
+import { NewSentenceInput } from '../type';
 
 @Component({
   selector: 'app-lesson',
@@ -61,5 +61,25 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   trackByFunc(index: number, sentence: Sentence): string {
     return sentence.id;
+  }
+
+  submitNewSentence(newInput: NewSentenceInput): void {
+    const { text } = newInput;
+
+    if (this.lesson) {
+      this.sentenceService
+        .addSentence({ text, lessonId: this.lesson.id })
+        .subscribe((addSentence: Sentence) => {
+          if (this.lesson) {
+            const sentences = this.lesson.sentences ? [...this.lesson.sentences, addSentence] : [addSentence];
+            this.lesson = {
+              ...this.lesson,
+              sentences,
+            };
+            this.cdr.markForCheck();
+            alert(`${addSentence.text} is added.`);
+          }
+        }, (err: Error) => alert(err));
+    }
   }
 }

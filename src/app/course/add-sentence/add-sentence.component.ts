@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Language } from '../../generated/graphql';
+import { NewSentenceInput } from '../type';
 
 @Component({
   selector: 'app-add-sentence',
@@ -12,7 +13,7 @@ export class AddSentenceComponent implements OnInit {
   language: Language | undefined | null = undefined;
 
   @Output()
-  submitNewSentence = new EventEmitter<{ text: string }>();
+  submitNewSentence = new EventEmitter<NewSentenceInput>();
 
   form = new FormGroup({});
 

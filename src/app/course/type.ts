@@ -7,3 +7,7 @@ export type NewCourseInput = {
 export type NewLessonInput = {
   name: string;
 };
+
+export type NewSentenceInput = {
+  text: string;
+}

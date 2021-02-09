@@ -32,7 +32,10 @@ mutation addLesson($newLesson: AddLessonInput!) {
 }
 
 mutation addSentence($newSentence: AddSentenceInput!) {
-
+  addSentence (newSentence: $newSentence) {
+    id
+    text
+  }
 }
 
 query Translation($sentenceId: String!, $languageId: String!) {

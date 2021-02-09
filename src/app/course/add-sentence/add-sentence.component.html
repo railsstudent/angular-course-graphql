@@ -7,11 +7,8 @@
     </label>
     <label>
       <span>Text:</span>
-      <input name="text" type="text" formControlName="text" required maxlength="1000" size="50">
+      <input name="text" type="text" formControlName="text" required maxlength="1000">
     </label>
     <button [disabled]="!form.valid">Add</button>
   </form>
-  <pre>
-    {{ form.value | json }}
-  </pre>
 </div>
