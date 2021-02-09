@@ -38,6 +38,18 @@ mutation addSentence($newSentence: AddSentenceInput!) {
   }
 }
 
+mutation addTranslation($newTranslation: AddTranslationInput!) {
+  addTranslation(newTranslation: $newTranslation) {
+    id
+    text
+    language {
+    	id
+      name
+      nativeName
+    }
+  }
+}
+
 query Translation($sentenceId: String!, $languageId: String!) {
   getTranslation(sentenceId: $sentenceId, languageId: $languageId) {
     id

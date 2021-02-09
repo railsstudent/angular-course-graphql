@@ -332,6 +332,23 @@ export type AddSentenceMutation = (
   ) }
 );
 
+export type AddTranslationMutationVariables = Exact<{
+  newTranslation: AddTranslationInput;
+}>;
+
+
+export type AddTranslationMutation = (
+  { __typename?: 'Mutation' }
+  & { addTranslation: (
+    { __typename?: 'Translation' }
+    & Pick<Translation, 'id' | 'text'>
+    & { language?: Maybe<(
+      { __typename?: 'Language' }
+      & Pick<Language, 'id' | 'name' | 'nativeName'>
+    )> }
+  ) }
+);
+
 export type TranslationQueryVariables = Exact<{
   sentenceId: Scalars['String'];
   languageId: Scalars['String'];
@@ -513,6 +530,30 @@ export const AddSentenceDocument = gql`
   })
   export class AddSentenceGQL extends Apollo.Mutation<AddSentenceMutation, AddSentenceMutationVariables> {
     document = AddSentenceDocument;
+
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const AddTranslationDocument = gql`
+    mutation addTranslation($newTranslation: AddTranslationInput!) {
+  addTranslation(newTranslation: $newTranslation) {
+    id
+    text
+    language {
+      id
+      name
+      nativeName
+    }
+  }
+}
+    `;
+
+@Injectable({
+    providedIn: 'root'
+  })
+  export class AddTranslationGQL extends Apollo.Mutation<AddTranslationMutation, AddTranslationMutationVariables> {
+    document = AddTranslationDocument;
 
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
