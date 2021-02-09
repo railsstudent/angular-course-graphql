@@ -1,1 +1,25 @@
-<p>add-translation works!</p>
+<div class="add-translation">
+  <p class="title">New Translation</p>
+  <form [formGroup]="form" novalidate (ngSubmit)="onSubmit($event)">
+    <label>
+      <span>Sentence:</span>
+      <select formControlName="sentenceId" style="width: 80%;">
+        <option [value]="sentence.id" *ngFor="let sentence of sentences">{{ sentence.text }}</option>
+      </select>
+    </label>
+    <label>
+      <span>Language:</span>
+      <select formControlName="languageId" style="min-width: 100px;">
+        <option [value]="language.id" *ngFor="let language of languages">{{ language.name }} ({{ language.nativeName }})</option>
+      </select>
+    </label>
+    <label>
+      <span>Text:</span>
+      <input name="text" type="text" formControlName="text" required maxlength="1000">
+    </label>
+    <button [disabled]="!form.valid">Add</button>
+    <pre>
+      {{ form.value | json }}
+    </pre>
+  </form>
+</div>

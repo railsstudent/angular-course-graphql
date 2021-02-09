@@ -10,4 +10,10 @@ export type NewLessonInput = {
 
 export type NewSentenceInput = {
   text: string;
+};
+
+export type NewTranslationInput = {
+  text: string;
+  sentenceId: string;
+  languageId: string;
 }

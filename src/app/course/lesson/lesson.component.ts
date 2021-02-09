@@ -3,8 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import { combineLatest, EMPTY, Subject } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import { Lesson, Translation, Sentence, Language } from '../../generated/graphql';
-import { LessonService, SentenceService } from '../services';
-import { NewSentenceInput } from '../type';
+import { CourseService, LessonService, SentenceService } from '../services';
+import { NewSentenceInput, NewTranslationInput } from '../type';
 
 @Component({
   selector: 'app-lesson',
@@ -19,10 +19,12 @@ export class LessonComponent implements OnInit, OnDestroy {
   lesson: Lesson | null | undefined = undefined;
   selectedTranslation: Translation | undefined = undefined;
   language: Language | undefined = undefined;
+  languages: Language[] | undefined = undefined;
 
   constructor(private route: ActivatedRoute,
               private lessonService: LessonService,
               private sentenceService: SentenceService,
+              private courseService: CourseService,
               private cdr: ChangeDetectorRef) {
   }
 
@@ -36,6 +38,12 @@ export class LessonComponent implements OnInit, OnDestroy {
       this.lesson = lesson as Lesson;
       this.cdr.markForCheck();
     }, (err) => alert(err));
+
+    this.courseService.getLanguages()
+      .subscribe((languages: Language[]) => {
+        this.languages = languages;
+        this.cdr.markForCheck();
+      });
 
     combineLatest([this.sentence$, this.translationLangauge$])
       .pipe(
@@ -80,6 +88,24 @@ export class LessonComponent implements OnInit, OnDestroy {
             alert(`${addSentence.text} is added.`);
           }
         }, (err: Error) => alert(err));
+    }
+  }
+
+  submitNewTranslation(newInput: NewTranslationInput): void {
+    if (newInput) {
+      // this.sentenceService
+      //   .addSentence({ text, lessonId: this.lesson.id })
+      //   .subscribe((addSentence: Sentence) => {
+      //     if (this.lesson) {
+      //       const sentences = this.lesson.sentences ? [...this.lesson.sentences, addSentence] : [addSentence];
+      //       this.lesson = {
+      //         ...this.lesson,
+      //         sentences,
+      //       };
+      //       this.cdr.markForCheck();
+      //       alert(`${addSentence.text} is added.`);
+      //     }
+      //   }, (err: Error) => alert(err));
     }
   }
 }

@@ -10,7 +10,13 @@
     <div class="spacer"></div>
   </div>
   <div class="main">
-    <app-add-sentence [language]="lesson?.course?.language" (submitNewSentence)="submitNewSentence($event)"></app-add-sentence>
+    <app-add-sentence
+      [language]="lesson?.course?.language"
+      (submitNewSentence)="submitNewSentence($event)"></app-add-sentence>
+    <app-add-translation
+      [languages]="languages"
+      [sentences]="lesson?.sentences"
+      (submitNewTranslation)="submitNewTranslation($event)"></app-add-translation>
     <p class="title">Sentences</p>
     <div class="sentences" *ngIf="lesson && lesson.sentences && lesson.sentences.length > 0 else noSentence">
       <div class="sentence" *ngFor="let sentence of lesson.sentences; index as i; trackBy:trackByFunc">
