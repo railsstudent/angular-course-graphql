@@ -68,7 +68,13 @@ export class LessonComponent implements OnInit, OnDestroy {
   }
 
   trackByFunc(index: number, sentence: Sentence): string {
+    console.log('trackByFunc called', 'index', index,  sentence);
     return sentence.id;
+  }
+
+  trackByAvailableTranslationFunc(index: number, availableTranslation: Language): string {
+    console.log('trackByAvailableTranslationFunc called', 'index', index, availableTranslation);
+    return `${index}-${availableTranslation.id}`;
   }
 
   submitNewSentence(newInput: NewSentenceInput): void {

@@ -18,8 +18,5 @@
       <input name="text" type="text" formControlName="text" required maxlength="1000">
     </label>
     <button [disabled]="!form.valid">Add</button>
-    <pre>
-      {{ form.value | json }}
-    </pre>
   </form>
 </div>

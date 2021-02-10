@@ -15,6 +15,7 @@ export class LessonService implements OnDestroy {
 
   /* TODO: optimistic updates */
   addLesson(newLesson: AddLessonInput): any {
+    console.log('newLesson', newLesson);
     return this.addLessonGQL.mutate({
       newLesson
     })

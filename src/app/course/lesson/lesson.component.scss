@@ -24,6 +24,26 @@
         margin-bottom: 1rem;
       }
     }
+
+    .inputs-container {
+      display: flex;
+      align-items: stretch;
+      margin-bottom: 1rem;
+
+      app-add-sentence {
+        margin-right: 1rem;
+      }
+
+      app-add-sentence, app-add-translation {
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: calc((100% - 2rem) / 2);
+      }
+
+      ::ng-deep app-add-sentence div.add-sentence {
+        height: 100%;
+      }
+    }
   }
 
   .sentence {
@@ -54,5 +74,22 @@
     padding: 0.25rem;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
+  }
+}
+
+@media only screen  and (max-width: 640px) {
+  .container .main {
+    .inputs-container {
+      flex-direction: column;
+
+      app-add-sentence {
+        margin-right: 0;
+        margin-bottom: 1rem;
+      }
+
+      app-add-sentence, app-add-translation {
+        flex-basis: 0;
+      }
+    }
   }
 }
