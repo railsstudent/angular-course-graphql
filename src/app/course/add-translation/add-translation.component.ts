@@ -1,6 +1,7 @@
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Language, Sentence } from './../../generated/graphql';
 import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { NewTranslationInput } from '../type';
 
 @Component({
   selector: 'app-add-translation',
@@ -15,7 +16,7 @@ export class AddTranslationComponent implements OnInit, OnChanges {
   sentences: Sentence[] | undefined | null = [];
 
   @Output()
-  submitNewTranlsation = new EventEmitter();
+  submitNewTranlsation = new EventEmitter<NewTranslationInput>();
 
   form = new FormGroup({});
 

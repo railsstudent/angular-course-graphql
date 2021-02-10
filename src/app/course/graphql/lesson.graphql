@@ -42,11 +42,6 @@ mutation addTranslation($newTranslation: AddTranslationInput!) {
   addTranslation(newTranslation: $newTranslation) {
     id
     text
-    language {
-    	id
-      name
-      nativeName
-    }
   }
 }
 

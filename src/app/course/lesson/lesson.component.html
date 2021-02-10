@@ -16,7 +16,8 @@
     <app-add-translation
       [languages]="languages"
       [sentences]="lesson?.sentences"
-      (submitNewTranslation)="submitNewTranslation($event)"></app-add-translation>
+      (submitNewTranlsation)="submitNewTranslation($event)"
+    ></app-add-translation>
     <p class="title">Sentences</p>
     <div class="sentences" *ngIf="lesson && lesson.sentences && lesson.sentences.length > 0 else noSentence">
       <div class="sentence" *ngFor="let sentence of lesson.sentences; index as i; trackBy:trackByFunc">

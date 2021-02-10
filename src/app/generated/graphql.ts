@@ -342,10 +342,6 @@ export type AddTranslationMutation = (
   & { addTranslation: (
     { __typename?: 'Translation' }
     & Pick<Translation, 'id' | 'text'>
-    & { language?: Maybe<(
-      { __typename?: 'Language' }
-      & Pick<Language, 'id' | 'name' | 'nativeName'>
-    )> }
   ) }
 );
 
@@ -540,11 +536,6 @@ export const AddTranslationDocument = gql`
   addTranslation(newTranslation: $newTranslation) {
     id
     text
-    language {
-      id
-      name
-      nativeName
-    }
   }
 }
     `;

@@ -1,7 +1,7 @@
-import { AddSentenceGQL, AddSentenceInput } from './../../generated/graphql';
+import { AddSentenceGQL, AddSentenceInput, AddTranslationInput, AddTranslationGQL } from './../../generated/graphql';
 import { Injectable, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
-import { map, startWith, takeUntil } from 'rxjs/operators';
+import { map, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { TranslationGQL } from '../../generated/graphql';
 
 @Injectable({
@@ -10,7 +10,8 @@ import { TranslationGQL } from '../../generated/graphql';
 export class SentenceService implements OnDestroy {
   private destroy$ = new Subject<boolean>();
 
-  constructor(private translationGQL: TranslationGQL, private addSentenceGQL: AddSentenceGQL) { }
+  constructor(private translationGQL: TranslationGQL, private addSentenceGQL: AddSentenceGQL,
+              private addTranslationGQL: AddTranslationGQL) { }
 
   getTranslation(sentenceId: string, languageId: string): any {
     return this.translationGQL.watch({
@@ -31,6 +32,16 @@ export class SentenceService implements OnDestroy {
     })
     .pipe(
       map(({ data }) => data?.addSentence),
+      takeUntil(this.destroy$)
+    );
+  }
+
+  addTranslate(newTranslation: AddTranslationInput): any {
+    return this.addTranslationGQL.mutate({
+      newTranslation
+    })
+    .pipe(
+      map(({ data }) => data?.addTranslation),
       takeUntil(this.destroy$)
     );
   }
