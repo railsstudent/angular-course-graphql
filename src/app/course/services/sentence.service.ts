@@ -1,8 +1,11 @@
-import { AddSentenceGQL, AddSentenceInput, AddTranslationInput, AddTranslationGQL } from './../../generated/graphql';
 import { Injectable, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
-import { map, startWith, switchMap, takeUntil } from 'rxjs/operators';
-import { TranslationGQL } from '../../generated/graphql';
+import { map, startWith, takeUntil } from 'rxjs/operators';
+import { AddSentenceGQL,
+  AddSentenceInput,
+  AddTranslationInput,
+  AddTranslationGQL,
+  TranslationGQL } from '../../generated/graphql';
 
 @Injectable({
   providedIn: 'root'

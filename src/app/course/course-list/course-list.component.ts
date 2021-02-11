@@ -38,8 +38,6 @@ export class CourseListComponent implements OnInit {
     this.service.addCourse(newCourse)
     .subscribe((addCourse: Course | undefined | null) => {
       if (addCourse) {
-        this.courses = this.courses ? [...this.courses, addCourse] : [addCourse];
-        this.cdr.markForCheck();
         alert(`${addCourse.name} is added.`);
       }
     }, (err: Error) => alert(err));

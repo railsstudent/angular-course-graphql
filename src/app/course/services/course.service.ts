@@ -22,6 +22,20 @@ export class CourseService implements OnDestroy {
   addCourse(newCourse: NewCourseInput): any {
     return this.addCourseGQL.mutate({
       newCourse
+    }, {
+      update: (cache, {data}) => {
+        const query = this.allCoursesGQL.document;
+        const returnedCourse = data?.addCourse;
+        const { courses: existingCourses = [] }: any = cache.readQuery({
+          query
+        });
+
+        const courses = existingCourses ? [...existingCourses, returnedCourse] : [returnedCourse];
+        cache.writeQuery({
+          query,
+          data: { courses }
+        });
+      }
     })
     .pipe(
       map(({ data }) => data?.addCourse),
