@@ -1,8 +1,7 @@
-import { LessonGQL } from './../../generated/graphql';
 import { Injectable, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
-import { AddLessonGQL, AddLessonInput } from 'src/app/generated/graphql';
+import { AddLessonGQL, AddLessonInput, LessonGQL, CourseGQL } from '../../generated/graphql';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -11,13 +10,43 @@ import { environment } from 'src/environments/environment';
 export class LessonService implements OnDestroy {
   private destroy$ = new Subject<boolean>();
 
-  constructor(private addLessonGQL: AddLessonGQL, private lessonGQL: LessonGQL) { }
+  constructor(private addLessonGQL: AddLessonGQL, private lessonGQL: LessonGQL, private courseGQL: CourseGQL) { }
 
   /* TODO: optimistic updates */
   addLesson(newLesson: AddLessonInput): any {
     console.log('newLesson', newLesson);
     return this.addLessonGQL.mutate({
       newLesson
+    }, {
+      update: (cache, { data }) => {
+        const args = {
+          offset: 0,
+          limit: 100,
+        };
+        const variables = {
+          courseId: newLesson.courseId,
+          args
+        }
+        const query = this.courseGQL.document;
+        const returnedLesson = data?.addLesson;
+        const { course: existingCourse }: any = cache.readQuery({
+          query,
+          variables
+        });
+
+        if (existingCourse) {
+          const course = {
+            ...existingCourse,
+            lessons: [ ...existingCourse.lessons, returnedLesson ]
+          };
+
+          cache.writeQuery({
+            query,
+            variables,
+            data: { course }
+          });
+        }
+      }
     })
     .pipe(
       map(({ data }) => data?.addLesson),

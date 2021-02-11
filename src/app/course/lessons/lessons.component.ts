@@ -46,8 +46,6 @@ export class LessonsComponent implements OnInit {
       })
       .subscribe((addLesson: Lesson) => {
         if (addLesson) {
-          this.lessons = this.lessons ? [...this.lessons, addLesson] : [addLesson];
-          this.cdr.markForCheck();
           alert(`${addLesson.name} is added.`);
         }
       }, (err: Error) => alert(err));
