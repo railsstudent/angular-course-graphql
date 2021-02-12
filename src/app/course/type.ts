@@ -16,4 +16,4 @@ export type NewTranslationInput = {
   text: string;
   sentenceId: string;
   languageId: string;
-}
+};

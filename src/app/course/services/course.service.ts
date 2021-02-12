@@ -18,7 +18,6 @@ export class CourseService implements OnDestroy {
               private courseGQL: CourseGQL,
               private addCourseGQL: AddCourseGQL, ) { }
 
-  /* TODO: optimistic updates */
   addCourse(newCourse: NewCourseInput): any {
     return this.addCourseGQL.mutate({
       newCourse

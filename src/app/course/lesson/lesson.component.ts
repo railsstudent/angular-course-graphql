@@ -84,13 +84,7 @@ export class LessonComponent implements OnInit, OnDestroy {
       this.sentenceService
         .addSentence({ text, lessonId: this.lesson.id })
         .subscribe((addSentence: Sentence) => {
-          if (this.lesson) {
-            const sentences = this.lesson.sentences ? [...this.lesson.sentences, addSentence] : [addSentence];
-            this.lesson = {
-              ...this.lesson,
-              sentences,
-            };
-            this.cdr.markForCheck();
+          if (addSentence) {
             alert(`${addSentence.text} is added.`);
           }
         }, (err: Error) => alert(err));

@@ -5,7 +5,9 @@ import { AddSentenceGQL,
   AddSentenceInput,
   AddTranslationInput,
   AddTranslationGQL,
-  TranslationGQL } from '../../generated/graphql';
+  TranslationGQL,
+  LessonGQL
+} from '../../generated/graphql';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +16,8 @@ export class SentenceService implements OnDestroy {
   private destroy$ = new Subject<boolean>();
 
   constructor(private translationGQL: TranslationGQL, private addSentenceGQL: AddSentenceGQL,
-              private addTranslationGQL: AddTranslationGQL) { }
+              private addTranslationGQL: AddTranslationGQL,
+              private lessonGQL: LessonGQL) { }
 
   getTranslation(sentenceId: string, languageId: string): any {
     return this.translationGQL.watch({
@@ -32,6 +35,31 @@ export class SentenceService implements OnDestroy {
   addSentence(newSentence: AddSentenceInput): any {
     return this.addSentenceGQL.mutate({
       newSentence
+    }, {
+      update: (cache, { data }) => {
+        const query = this.lessonGQL.document;
+        const returnedSentence = data?.addSentence;
+
+        const options = {
+          query,
+          variables: {
+            lessonId: newSentence.lessonId
+          }
+        };
+
+        const { lesson: existingLesson }: any = cache.readQuery(options);
+        const { sentences: existingSentences } = existingLesson;
+        const sentences = [ ...existingSentences, returnedSentence ];
+        const lesson = {
+          ...existingLesson,
+          sentences
+        };
+
+        cache.writeQuery({
+          ...options,
+          data: { lesson }
+        });
+      }
     })
     .pipe(
       map(({ data }) => data?.addSentence),

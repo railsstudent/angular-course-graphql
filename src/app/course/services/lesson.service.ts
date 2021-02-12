@@ -12,9 +12,7 @@ export class LessonService implements OnDestroy {
 
   constructor(private addLessonGQL: AddLessonGQL, private lessonGQL: LessonGQL, private courseGQL: CourseGQL) { }
 
-  /* TODO: optimistic updates */
   addLesson(newLesson: AddLessonInput): any {
-    console.log('newLesson', newLesson);
     return this.addLessonGQL.mutate({
       newLesson
     }, {
@@ -23,16 +21,20 @@ export class LessonService implements OnDestroy {
           offset: 0,
           limit: 100,
         };
+
         const variables = {
           courseId: newLesson.courseId,
           args
-        }
+        };
         const query = this.courseGQL.document;
-        const returnedLesson = data?.addLesson;
-        const { course: existingCourse }: any = cache.readQuery({
+
+        const options = {
           query,
           variables
-        });
+        };
+
+        const returnedLesson = data?.addLesson;
+        const { course: existingCourse }: any = cache.readQuery(options);
 
         if (existingCourse) {
           const course = {
@@ -41,8 +43,7 @@ export class LessonService implements OnDestroy {
           };
 
           cache.writeQuery({
-            query,
-            variables,
+            ...options,
             data: { course }
           });
         }
@@ -50,6 +51,7 @@ export class LessonService implements OnDestroy {
     })
     .pipe(
       map(({ data }) => data?.addLesson),
+      takeUntil(this.destroy$)
     );
   }
 
