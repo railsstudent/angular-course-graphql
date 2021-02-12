@@ -1,7 +1,7 @@
 import { CourseGQL } from './../../generated/graphql';
 import { Injectable, OnDestroy } from '@angular/core';
 import { of, Subject, throwError } from 'rxjs';
-import { catchError, map, takeUntil, tap } from 'rxjs/operators';
+import { catchError, map, share, takeUntil, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { AllCoursesGQL, LanguagesGQL, AddCourseGQL, Course } from '../../generated/graphql';
 import { NewCourseInput } from '../type';
@@ -65,6 +65,7 @@ export class CourseService implements OnDestroy {
       .valueChanges
       .pipe(
         map(({ data }) => data.getLanguages),
+        share(),
         takeUntil(this.destroy$)
       );
   }

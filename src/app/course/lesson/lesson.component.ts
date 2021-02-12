@@ -15,10 +15,9 @@ import { NewSentenceInput, NewTranslationInput } from '../type';
 export class LessonComponent implements OnInit, OnDestroy {
   destroy$ = new Subject<boolean>();
   sentence$ = new Subject<string>();
-  translationLangauge$ = new Subject<string>();
+  translationLanguage$ = new Subject<string>();
   lesson: Lesson | null | undefined = undefined;
   selectedTranslation: Translation | undefined = undefined;
-  language: Language | undefined = undefined;
   languages: Language[] | undefined = undefined;
 
   constructor(private route: ActivatedRoute,
@@ -29,23 +28,22 @@ export class LessonComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.route.paramMap.pipe(
+    const lesson$ = this.route.paramMap.pipe(
       switchMap(params => {
         const lessonId = params.get('lessonId');
         return lessonId ? this.lessonService.getLesson(lessonId) : EMPTY;
-      }),
-    ).subscribe((lesson: any) => {
-      this.lesson = lesson as Lesson;
-      this.cdr.markForCheck();
-    }, (err) => alert(err));
+      })
+    );
 
-    this.courseService.getLanguages()
-      .subscribe((languages: Language[]) => {
-        this.languages = languages;
+    combineLatest([lesson$, this.courseService.getLanguages()])
+      .subscribe(([lesson, languages]: any) => {
+        this.lesson = lesson as Lesson;
+        const language = lesson?.course?.language;
+        this.languages = language ? languages.filter((item: Language) => item.id !== language.id) : languages;
         this.cdr.markForCheck();
-      });
+      }, (err) => alert(err));
 
-    combineLatest([this.sentence$, this.translationLangauge$])
+    combineLatest([this.sentence$, this.translationLanguage$])
       .pipe(
         switchMap(([sentenceId, languageId]) =>
           this.sentenceService.getTranslation(sentenceId, languageId)
@@ -59,7 +57,7 @@ export class LessonComponent implements OnInit, OnDestroy {
 
   showTranslation(sentence: Sentence, availableTranslation: Language): void {
     this.sentence$.next(sentence?.id);
-    this.translationLangauge$.next(availableTranslation?.id);
+    this.translationLanguage$.next(availableTranslation?.id);
   }
 
   ngOnDestroy(): void {
