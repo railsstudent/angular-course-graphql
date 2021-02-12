@@ -4,22 +4,28 @@
 
 .container {
   padding: 0.5rem;
-}
+  max-width: calc(100% - 1rem);
 
-.course {
-  &-list {
-    display: flex;
-    flex-wrap: wrap;
+  app-add-course {
+   margin-left: 0.5rem;
+   margin-right: 0.5rem;
   }
 
-  &-container {
-    flex: 1 1 calc(100% / 4);
-  }
+  .course {
+    &-list {
+      display: flex;
+      flex-wrap: wrap;
+    }
 
-  &-card {
-    margin: 0.5rem;
+    &-container {
+      flex: 1 1 calc(100% / 4);
+    }
 
-    flex-basis: 0 1 25%;
+    &-card {
+      margin: 0.5rem;
+
+      flex-basis: 0 1 25%;
+    }
   }
 }
 

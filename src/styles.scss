@@ -44,3 +44,11 @@ input, select {
 p.title {
   font-size: 1.2rem;
 }
+
+label.label {
+  @apply m-2;
+  span.field {
+    @apply mr-2;
+    @apply text-gray-500;
+  }
+}

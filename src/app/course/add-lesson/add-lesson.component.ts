@@ -6,7 +6,13 @@ import { NewLessonInput } from '../type';
 @Component({
   selector: 'app-add-lesson',
   templateUrl: './add-lesson.component.html',
-  styleUrls: ['./add-lesson.component.scss'],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddLessonComponent implements OnInit {

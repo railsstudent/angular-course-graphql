@@ -1,12 +1,12 @@
-<div class="course">
+<div class="course p-2 border border-gray-400 shadow-md rounded-lg">
   <p>
-    <span>Name: </span><span>{{ course?.name }}</span>
+    <span class="text-gray-500 text-lg">Name: </span><span class="text-lg">{{ course?.name }}</span>
   </p>
   <p>
-    <span>Description: </span><span>{{ course?.description }}</span>
+    <span class="text-gray-500">Description: </span><span>{{ course?.description }}</span>
   </p>
   <p>
-    <span>Language: </span><span>{{ course?.language?.name }} ({{ course?.language?.nativeName }})</span>
+    <span class="text-gray-500">Language: </span><span>{{ course?.language?.name }} ({{ course?.language?.nativeName }})</span>
   </p>
   <p class="actions">
     <button class="course-button" (click)="viewLesson()">See Lessons</button>

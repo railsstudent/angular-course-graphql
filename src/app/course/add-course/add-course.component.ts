@@ -6,7 +6,13 @@ import { NewCourseInput } from '../type';
 @Component({
   selector: 'app-add-course',
   templateUrl: './add-course.component.html',
-  styleUrls: ['./add-course.component.scss'],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddCourseComponent implements OnInit, OnChanges {

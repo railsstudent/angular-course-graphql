@@ -13,7 +13,7 @@
     <app-add-lesson [language]="course?.language" (submitNewLesson)="submitNewLesson($event)"></app-add-lesson>
     <p class="title">My Lessons</p>
     <div class="lessons" *ngIf="lessons && lessons.length > 0 else noLesson">
-      <p class="lesson" *ngFor="let lesson of lessons; trackBy:trackByFunc">
+      <p class="lesson p-1" *ngFor="let lesson of lessons; trackBy:trackByFunc">
         <a [routerLink]="[ lesson.id ]">{{ lesson.name }}</a>
       </p>
     </div>
