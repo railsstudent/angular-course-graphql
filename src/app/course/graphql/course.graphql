@@ -1,24 +1,29 @@
+fragment CourseLanguage on Language {
+  id
+  name
+  nativeName
+}
+
+fragment CourseName on Course {
+  id
+  name
+  description
+}
+
 query AllCourses {
   courses {
-    id
-    name
-    description
+    ...CourseName
     language {
-      id
-      name
-      nativeName
+      ...CourseLanguage
     }
   }
 }
 
 query Course ($courseId: String!, $args: PaginationArgs!) {
   course(id: $courseId) {
-    id
-    name
+    ...CourseName
     language {
-      id
-      name
-      nativeName
+      ...CourseLanguage
     }
     lessons (args: $args) {
       id
@@ -29,21 +34,15 @@ query Course ($courseId: String!, $args: PaginationArgs!) {
 
 query Languages {
   getLanguages {
-    id
-    name
-    nativeName
+    ...CourseLanguage
   }
 }
 
 mutation addCourse ($newCourse: AddCourseInput!) {
   addCourse(newCourse: $newCourse) {
-   	id
-  	name
-    description,
+    ...CourseName,
     language {
-      id
-      name
-      nativeName
+      ...CourseLanguage
     }
   }
 }

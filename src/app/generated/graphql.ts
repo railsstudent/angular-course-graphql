@@ -214,6 +214,16 @@ export type UpdateSentenceInput = {
   text?: Maybe<Scalars['String']>;
 };
 
+export type CourseLanguageFragment = (
+  { __typename?: 'Language' }
+  & Pick<Language, 'id' | 'name' | 'nativeName'>
+);
+
+export type CourseNameFragment = (
+  { __typename?: 'Course' }
+  & Pick<Course, 'id' | 'name' | 'description'>
+);
+
 export type AllCoursesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -221,11 +231,11 @@ export type AllCoursesQuery = (
   { __typename?: 'Query' }
   & { courses?: Maybe<Array<(
     { __typename?: 'Course' }
-    & Pick<Course, 'id' | 'name' | 'description'>
     & { language?: Maybe<(
       { __typename?: 'Language' }
-      & Pick<Language, 'id' | 'name' | 'nativeName'>
+      & CourseLanguageFragment
     )> }
+    & CourseNameFragment
   )>> }
 );
 
@@ -239,14 +249,14 @@ export type CourseQuery = (
   { __typename?: 'Query' }
   & { course?: Maybe<(
     { __typename?: 'Course' }
-    & Pick<Course, 'id' | 'name'>
     & { language?: Maybe<(
       { __typename?: 'Language' }
-      & Pick<Language, 'id' | 'name' | 'nativeName'>
+      & CourseLanguageFragment
     )>, lessons?: Maybe<Array<(
       { __typename?: 'Lesson' }
       & Pick<Lesson, 'id' | 'name'>
     )>> }
+    & CourseNameFragment
   )> }
 );
 
@@ -257,7 +267,7 @@ export type LanguagesQuery = (
   { __typename?: 'Query' }
   & { getLanguages: Array<(
     { __typename?: 'Language' }
-    & Pick<Language, 'id' | 'name' | 'nativeName'>
+    & CourseLanguageFragment
   )> }
 );
 
@@ -270,11 +280,11 @@ export type AddCourseMutation = (
   { __typename?: 'Mutation' }
   & { addCourse: (
     { __typename?: 'Course' }
-    & Pick<Course, 'id' | 'name' | 'description'>
     & { language?: Maybe<(
       { __typename?: 'Language' }
-      & Pick<Language, 'id' | 'name' | 'nativeName'>
+      & CourseLanguageFragment
     )> }
+    & CourseNameFragment
   ) }
 );
 
@@ -363,20 +373,31 @@ export type TranslationQuery = (
   ) }
 );
 
+export const CourseLanguageFragmentDoc = gql`
+    fragment CourseLanguage on Language {
+  id
+  name
+  nativeName
+}
+    `;
+export const CourseNameFragmentDoc = gql`
+    fragment CourseName on Course {
+  id
+  name
+  description
+}
+    `;
 export const AllCoursesDocument = gql`
     query AllCourses {
   courses {
-    id
-    name
-    description
+    ...CourseName
     language {
-      id
-      name
-      nativeName
+      ...CourseLanguage
     }
   }
 }
-    `;
+    ${CourseNameFragmentDoc}
+${CourseLanguageFragmentDoc}`;
 
 @Injectable({
     providedIn: 'root'
@@ -391,12 +412,9 @@ export const AllCoursesDocument = gql`
 export const CourseDocument = gql`
     query Course($courseId: String!, $args: PaginationArgs!) {
   course(id: $courseId) {
-    id
-    name
+    ...CourseName
     language {
-      id
-      name
-      nativeName
+      ...CourseLanguage
     }
     lessons(args: $args) {
       id
@@ -404,7 +422,8 @@ export const CourseDocument = gql`
     }
   }
 }
-    `;
+    ${CourseNameFragmentDoc}
+${CourseLanguageFragmentDoc}`;
 
 @Injectable({
     providedIn: 'root'
@@ -419,12 +438,10 @@ export const CourseDocument = gql`
 export const LanguagesDocument = gql`
     query Languages {
   getLanguages {
-    id
-    name
-    nativeName
+    ...CourseLanguage
   }
 }
-    `;
+    ${CourseLanguageFragmentDoc}`;
 
 @Injectable({
     providedIn: 'root'
@@ -439,17 +456,14 @@ export const LanguagesDocument = gql`
 export const AddCourseDocument = gql`
     mutation addCourse($newCourse: AddCourseInput!) {
   addCourse(newCourse: $newCourse) {
-    id
-    name
-    description
+    ...CourseName
     language {
-      id
-      name
-      nativeName
+      ...CourseLanguage
     }
   }
 }
-    `;
+    ${CourseNameFragmentDoc}
+${CourseLanguageFragmentDoc}`;
 
 @Injectable({
     providedIn: 'root'
