@@ -288,6 +288,16 @@ export type AddCourseMutation = (
   ) }
 );
 
+export type LessonNameFragment = (
+  { __typename?: 'Lesson' }
+  & Pick<Lesson, 'id' | 'name'>
+);
+
+export type TranslationTextFragment = (
+  { __typename?: 'Translation' }
+  & Pick<Translation, 'id' | 'text'>
+);
+
 export type LessonQueryVariables = Exact<{
   lessonId: Scalars['String'];
 }>;
@@ -297,14 +307,13 @@ export type LessonQuery = (
   { __typename?: 'Query' }
   & { lesson?: Maybe<(
     { __typename?: 'Lesson' }
-    & Pick<Lesson, 'id' | 'name'>
     & { course?: Maybe<(
       { __typename?: 'Course' }
-      & Pick<Course, 'id' | 'name'>
       & { language?: Maybe<(
         { __typename?: 'Language' }
-        & Pick<Language, 'id' | 'name' | 'nativeName'>
+        & CourseLanguageFragment
       )> }
+      & CourseNameFragment
     )>, sentences?: Maybe<Array<(
       { __typename?: 'Sentence' }
       & Pick<Sentence, 'id' | 'text'>
@@ -313,6 +322,7 @@ export type LessonQuery = (
         & Pick<Language, 'id' | 'name'>
       )>> }
     )>> }
+    & LessonNameFragment
   )> }
 );
 
@@ -325,7 +335,7 @@ export type AddLessonMutation = (
   { __typename?: 'Mutation' }
   & { addLesson: (
     { __typename?: 'Lesson' }
-    & Pick<Lesson, 'id' | 'name'>
+    & LessonNameFragment
   ) }
 );
 
@@ -351,11 +361,11 @@ export type AddTranslationMutation = (
   { __typename?: 'Mutation' }
   & { addTranslation: (
     { __typename?: 'Translation' }
-    & Pick<Translation, 'id' | 'text'>
     & { language?: Maybe<(
       { __typename?: 'Language' }
-      & Pick<Language, 'id' | 'name'>
+      & CourseLanguageFragment
     )> }
+    & TranslationTextFragment
   ) }
 );
 
@@ -369,7 +379,7 @@ export type TranslationQuery = (
   { __typename?: 'Query' }
   & { getTranslation: (
     { __typename?: 'Translation' }
-    & Pick<Translation, 'id' | 'text'>
+    & TranslationTextFragment
   ) }
 );
 
@@ -385,6 +395,18 @@ export const CourseNameFragmentDoc = gql`
   id
   name
   description
+}
+    `;
+export const LessonNameFragmentDoc = gql`
+    fragment LessonName on Lesson {
+  id
+  name
+}
+    `;
+export const TranslationTextFragmentDoc = gql`
+    fragment TranslationText on Translation {
+  id
+  text
 }
     `;
 export const AllCoursesDocument = gql`
@@ -478,15 +500,11 @@ ${CourseLanguageFragmentDoc}`;
 export const LessonDocument = gql`
     query Lesson($lessonId: String!) {
   lesson(id: $lessonId) {
-    id
-    name
+    ...LessonName
     course {
-      id
-      name
+      ...CourseName
       language {
-        id
-        name
-        nativeName
+        ...CourseLanguage
       }
     }
     sentences {
@@ -499,7 +517,9 @@ export const LessonDocument = gql`
     }
   }
 }
-    `;
+    ${LessonNameFragmentDoc}
+${CourseNameFragmentDoc}
+${CourseLanguageFragmentDoc}`;
 
 @Injectable({
     providedIn: 'root'
@@ -514,11 +534,10 @@ export const LessonDocument = gql`
 export const AddLessonDocument = gql`
     mutation addLesson($newLesson: AddLessonInput!) {
   addLesson(newLesson: $newLesson) {
-    id
-    name
+    ...LessonName
   }
 }
-    `;
+    ${LessonNameFragmentDoc}`;
 
 @Injectable({
     providedIn: 'root'
@@ -552,15 +571,14 @@ export const AddSentenceDocument = gql`
 export const AddTranslationDocument = gql`
     mutation addTranslation($newTranslation: AddTranslationInput!) {
   addTranslation(newTranslation: $newTranslation) {
-    id
-    text
+    ...TranslationText
     language {
-      id
-      name
+      ...CourseLanguage
     }
   }
 }
-    `;
+    ${TranslationTextFragmentDoc}
+${CourseLanguageFragmentDoc}`;
 
 @Injectable({
     providedIn: 'root'
@@ -575,11 +593,10 @@ export const AddTranslationDocument = gql`
 export const TranslationDocument = gql`
     query Translation($sentenceId: String!, $languageId: String!) {
   getTranslation(sentenceId: $sentenceId, languageId: $languageId) {
-    id
-    text
+    ...TranslationText
   }
 }
-    `;
+    ${TranslationTextFragmentDoc}`;
 
 @Injectable({
     providedIn: 'root'

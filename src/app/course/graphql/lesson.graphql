@@ -1,14 +1,32 @@
+fragment CourseLanguage on Language {
+  id
+  name
+  nativeName
+}
+
+fragment CourseName on Course {
+  id
+  name
+  description
+}
+
+fragment LessonName on Lesson {
+  id
+  name
+}
+
+fragment TranslationText on Translation {
+  id
+  text
+}
+
 query Lesson ($lessonId: String!)  {
   lesson(id: $lessonId) {
-    id
-    name
+    ...LessonName
     course {
-      id
-      name
+      ...CourseName
       language {
-        id
-        name
-        nativeName
+        ...CourseLanguage
       }
     }
     sentences {
@@ -26,8 +44,7 @@ mutation addLesson($newLesson: AddLessonInput!) {
   addLesson(
     newLesson: $newLesson
   ) {
-    id
-    name
+    ...LessonName
   }
 }
 
@@ -40,18 +57,15 @@ mutation addSentence($newSentence: AddSentenceInput!) {
 
 mutation addTranslation($newTranslation: AddTranslationInput!) {
   addTranslation(newTranslation: $newTranslation) {
-    id
-    text,
+    ...TranslationText,
     language {
-      id
-      name
+      ...CourseLanguage
     }
   }
 }
 
 query Translation($sentenceId: String!, $languageId: String!) {
   getTranslation(sentenceId: $sentenceId, languageId: $languageId) {
-    id
-    text
+    ...TranslationText
   }
 }
