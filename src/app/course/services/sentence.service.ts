@@ -6,7 +6,9 @@ import { AddSentenceGQL,
   AddTranslationInput,
   AddTranslationGQL,
   TranslationGQL,
-  LessonGQL
+  LessonGQL,
+  Sentence,
+  Language
 } from '../../generated/graphql';
 
 @Injectable({
@@ -67,9 +69,56 @@ export class SentenceService implements OnDestroy {
     );
   }
 
-  addTranslate(newTranslation: AddTranslationInput): any {
+  addTranslate(lessonId: string, newTranslation: AddTranslationInput): any {
     return this.addTranslationGQL.mutate({
       newTranslation
+    }, {
+      update: (cache, { data }) => {
+        const query = this.lessonGQL.document;
+        const returnedLanguage: Language | undefined | null = data?.addTranslation?.language;
+        if (!returnedLanguage) {
+          return;
+        }
+
+        const options = {
+          query,
+          variables: {
+            lessonId
+          }
+        };
+
+        const { sentenceId } = newTranslation;
+        const { lesson: existingLesson }: any = cache.readQuery(options);
+        const existingSentences: Sentence[] = existingLesson?.sentences || [];
+        const existingSentence = existingSentences.find(item => item.id === sentenceId);
+        if (!existingSentence) {
+          return;
+        }
+
+        const existingTranslations = existingSentence.availableTranslations || [];
+        const availableTranslations = [...existingTranslations, returnedLanguage]
+          .sort((a, b) => {
+            const aName = a.name || '';
+            const bName = b.name || '';
+            return aName.localeCompare(bName);
+          });
+        const sentences = existingSentences.map((item: Sentence) =>
+          (item.id !== sentenceId) ? item : {
+            ...item,
+            availableTranslations
+          }
+        );
+
+        const lesson = {
+          ...existingLesson,
+          sentences
+        };
+
+        cache.writeQuery({
+          ...options,
+          data: { lesson }
+        });
+      }
     })
     .pipe(
       map(({ data }) => data?.addTranslation),

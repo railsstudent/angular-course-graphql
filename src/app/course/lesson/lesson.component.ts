@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, EMPTY, Subject } from 'rxjs';
-import { switchMap, takeUntil, tap } from 'rxjs/operators';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { Lesson, Translation, Sentence, Language } from '../../generated/graphql';
 import { CourseService, LessonService, SentenceService } from '../services';
 import { NewSentenceInput, NewTranslationInput } from '../type';
@@ -68,13 +68,11 @@ export class LessonComponent implements OnInit, OnDestroy {
   }
 
   trackByFunc(index: number, sentence: Sentence): string {
-    console.log('trackByFunc called', 'index', index,  sentence);
     return sentence.id;
   }
 
   trackByAvailableTranslationFunc(index: number, availableTranslation: Language): string {
-    console.log('trackByAvailableTranslationFunc called', 'index', index, availableTranslation);
-    return `${index}-${availableTranslation.id}`;
+    return availableTranslation.id;
   }
 
   submitNewSentence(newInput: NewSentenceInput): void {
@@ -94,16 +92,9 @@ export class LessonComponent implements OnInit, OnDestroy {
   submitNewTranslation(newInput: NewTranslationInput): void {
     if (newInput && this.lesson) {
       const lessonId = this.lesson.id;
-      let addTranslation: Translation | undefined;
       this.sentenceService
-        .addTranslate(newInput)
-        .pipe(
-          tap((result: Translation) => addTranslation = result),
-          switchMap(() => this.lessonService.getLesson(lessonId))
-        )
-        .subscribe((lesson: Lesson) => {
-          this.lesson = lesson;
-          this.cdr.markForCheck();
+        .addTranslate(lessonId, newInput)
+        .subscribe((addTranslation: Translation) => {
           if (addTranslation) {
             alert(`${addTranslation.text} is added.`);
           }

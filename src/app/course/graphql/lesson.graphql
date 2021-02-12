@@ -41,7 +41,11 @@ mutation addSentence($newSentence: AddSentenceInput!) {
 mutation addTranslation($newTranslation: AddTranslationInput!) {
   addTranslation(newTranslation: $newTranslation) {
     id
-    text
+    text,
+    language {
+      id
+      name
+    }
   }
 }
 
