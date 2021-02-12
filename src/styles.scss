@@ -1,4 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
 * {
   padding: 0;
   margin: 0;
@@ -14,15 +18,27 @@ body {
 
 button {
   padding: 8px 18px;
-  border-radius: 0.5rem;
+  @apply bg-blue-600;
+  @apply text-white;
+  @apply rounded-lg;
 
   &:hover {
     cursor: pointer;
+    @apply bg-blue-700;
   }
 }
 
 input, select {
   padding: 0.5rem;
+  @apply border;
+  @apply border-gray-400;
+  @apply rounded-lg;
+  &:focus {
+    @apply outline-none;
+    @apply ring-2;
+    @apply ring-blue-400;
+    @apply border-transparent;
+  }
 }
 
 p.title {
