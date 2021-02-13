@@ -1,22 +1,22 @@
-<div class="add-translation">
+<div class="add-translation p-2 form-border">
   <p class="title">New Translation</p>
-  <form [formGroup]="form" novalidate (ngSubmit)="onSubmit($event)">
-    <label>
-      <span>Sentence:</span>
+  <form class="flex flex-col" [formGroup]="form" novalidate (ngSubmit)="onSubmit($event)">
+    <label class="label">
+      <span class="field">Sentence:</span>
       <select formControlName="sentenceId" style="width: 80%;">
         <option [value]="sentence.id" *ngFor="let sentence of sentences">{{ sentence.text }}</option>
       </select>
     </label>
-    <label>
-      <span>Language:</span>
+    <label class="label">
+      <span class="field">Language:</span>
       <select formControlName="languageId" style="min-width: 100px;">
         <option [value]="language.id" *ngFor="let language of languages">{{ language.name }} ({{ language.nativeName }})</option>
       </select>
     </label>
-    <label>
-      <span>Text:</span>
-      <input name="text" type="text" formControlName="text" required maxlength="1000">
+    <label class="label">
+      <span class="field">Text:</span>
+      <input style="width: 80%;" name="text" type="text" formControlName="text" required maxlength="1000" placeholder="(max. length: 1000)">
     </label>
-    <button [disabled]="!form.valid">Add</button>
+    <button class="self-start m-2" [disabled]="!form.valid">Add</button>
   </form>
 </div>

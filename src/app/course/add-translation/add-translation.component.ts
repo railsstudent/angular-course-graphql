@@ -6,7 +6,13 @@ import { NewTranslationInput } from '../type';
 @Component({
   selector: 'app-add-translation',
   templateUrl: './add-translation.component.html',
-  styleUrls: ['./add-translation.component.scss']
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `
+  ]
 })
 export class AddTranslationComponent implements OnInit, OnChanges {
   @Input()
@@ -24,7 +30,7 @@ export class AddTranslationComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      text: new FormControl('', { validators: [Validators.required, Validators.maxLength(50)], updateOn: 'blur' }),
+      text: new FormControl('', { validators: [Validators.required, Validators.maxLength(1000)], updateOn: 'blur' }),
       sentenceId: new FormControl(this.sentences?.[0]?.id, { validators: Validators.required, updateOn: 'change' }),
       languageId: new FormControl(this.languages?.[0]?.id, { validators: Validators.required, updateOn: 'change' })
     });
