@@ -26,6 +26,14 @@ button {
     cursor: pointer;
     @apply bg-blue-700;
   }
+
+  &.back {
+    @apply bg-indigo-500;
+
+    &:hover {
+      @apply bg-indigo-600;
+    }
+  }
 }
 
 input, select {
