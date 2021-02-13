@@ -6,7 +6,13 @@ import { NewSentenceInput } from '../type';
 @Component({
   selector: 'app-add-sentence',
   templateUrl: './add-sentence.component.html',
-  styleUrls: ['./add-sentence.component.scss']
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `
+  ]
 })
 export class AddSentenceComponent implements OnInit {
   @Input()

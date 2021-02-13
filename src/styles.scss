@@ -47,8 +47,16 @@ p.title {
 
 label.label {
   @apply m-2;
-  span.field {
-    @apply mr-2;
-    @apply text-gray-500;
-  }
+}
+
+span.field {
+  @apply mr-2;
+  @apply text-gray-500;
+}
+
+.form-border {
+  @apply border;
+  @apply border-gray-400;
+  @apply shadow-md;
+  @apply rounded-lg;
 }
