@@ -7,38 +7,22 @@
 
   .header {
     min-height: 70px;
-    padding: 0.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     border-bottom: 1px solid #4a4a4a;
 
+    .back, .spacer {
+      flex: 1 1 10%;
+    }
+
     .lesson {
+      flex: 1 1 calc(100% - 1rem - 20%);
+      text-align: center;
       font-size: 1.5rem;
     }
   }
 
   .main {
-    padding: 1rem;
-
-    p {
-      &.title {
-        margin-bottom: 1rem;
-      }
-    }
-
     .inputs-container {
-      display: flex;
-      align-items: stretch;
-      margin-bottom: 1rem;
-
-      app-add-sentence {
-        margin-right: 1rem;
-      }
-
       app-add-sentence, app-add-translation {
-        flex-grow: 1;
-        flex-shrink: 1;
         flex-basis: calc((100% - 2rem) / 2);
       }
 
@@ -47,46 +31,16 @@
       }
     }
   }
-
-  .sentence {
-    padding: 0.5rem 1rem 0.5rem 0;
-
-    .text {
-      margin-bottom: 0.5rem;
-    }
-  }
-
-  .translations {
-    .actions {
-      display: flex;
-
-      .available {
-        margin-right: 0.75rem;
-      }
-
-      .btn-translation {
-        margin-right: 0.5rem;
-      }
-    }
-  }
-
-
-  .translation {
-    border: 1px dashed green;
-    padding: 0.25rem;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
 }
 
 @media only screen  and (max-width: 640px) {
   .container .main {
     .inputs-container {
-      flex-direction: column;
+      @apply flex-col;
 
       app-add-sentence {
-        margin-right: 0;
-        margin-bottom: 1rem;
+        @apply mr-0;
+        @apply mb-4;
       }
 
       app-add-sentence, app-add-translation {
