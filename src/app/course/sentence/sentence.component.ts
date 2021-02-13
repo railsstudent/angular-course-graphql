@@ -2,7 +2,7 @@ import { Translation } from './../../generated/graphql';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { combineLatest, Subject } from 'rxjs';
 import { Language, Sentence } from '../../generated/graphql';
-import { switchMap, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { SentenceService } from '../services';
 
 @Component({
@@ -34,6 +34,9 @@ export class SentenceComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     combineLatest([this.sentence$, this.translationLanguage$])
     .pipe(
+      distinctUntilChanged((a: [string, string], b: [string, string]) =>
+        a[0] === b[0] && a[1] === b[1]
+      ),
       switchMap(([sentenceId, languageId]) =>
         this.sentenceService.getTranslation(sentenceId, languageId)
       ),
