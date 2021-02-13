@@ -1,8 +1,8 @@
-<div class="container">
-  <app-add-course [languages]="languages" (submitNewCourse)="submitNewCourse($event)"></app-add-course>
-  <div class="course-list" *ngIf="courses else noCourse">
+<div class="container p-2">
+  <app-add-course class="ml-2 mr-2" [languages]="languages" (submitNewCourse)="submitNewCourse($event)"></app-add-course>
+  <div class="course-list flex" *ngIf="courses else noCourse">
     <div class="course-container" *ngFor="let course of courses; trackBy:trackByFunc">
-      <app-course-card class="course-card" [course]="course"></app-course-card>
+      <app-course-card class="course-card m-2" [course]="course"></app-course-card>
     </div>
   </div>
 </div>

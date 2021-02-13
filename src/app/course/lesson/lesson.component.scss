@@ -3,6 +3,8 @@
 }
 
 .container {
+  max-width: calc(100% - 1rem);
+
   .header {
     min-height: 70px;
     padding: 0.5rem;
