@@ -1,20 +1,20 @@
-<div class="container">
-  <div class="header">
+<div class="container font-sans">
+  <div class="header p-2 flex justify-between items-center">
     <div class="back">
       <button [routerLink]="['/courses']" class="back">Back</button>
     </div>
-    <div class="course">
+    <div class="course text-2xl text-center">
       <p>{{ course?.name }}</p>
       <p>{{ course?.description }}</p>
     </div>
     <div class="spacer"></div>
   </div>
-  <div class="main">
-    <app-add-lesson [language]="course?.language" (submitNewLesson)="submitNewLesson($event)"></app-add-lesson>
-    <p class="title">My Lessons</p>
+  <div class="main p-2">
+    <app-add-lesson class="mb-4" [language]="course?.language" (submitNewLesson)="submitNewLesson($event)"></app-add-lesson>
+    <p class="title mb-4">My Lessons</p>
     <div class="lessons" *ngIf="lessons && lessons.length > 0 else noLesson">
       <p class="lesson p-1" *ngFor="let lesson of lessons; trackBy:trackByFunc">
-        <a [routerLink]="[ lesson.id ]">{{ lesson.name }}</a>
+        <a class="text-lg" [routerLink]="[ lesson.id ]">{{ lesson.name }}</a>
       </p>
     </div>
   </div>

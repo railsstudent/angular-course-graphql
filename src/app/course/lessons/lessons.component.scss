@@ -7,10 +7,6 @@
 
   .header {
     min-height: 70px;
-    padding: 0.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     border-bottom: 1px solid #4a4a4a;
 
     .back, .spacer {
@@ -19,33 +15,11 @@
 
     .course {
       flex: 1 1 calc(100% - 1rem - 20%);
-      text-align: center;
-      font-size: 1.5rem;
     }
   }
 
   .main {
-    padding: 0.5rem;
-
-    app-add-lesson {
-      margin-bottom: 1rem;
-    }
-
     p {
-      &.title {
-        margin-bottom: 1rem;
-      }
-
-      &.lesson {
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-        padding-left: 0.5rem
-
-        a {
-          font-size: 1.1rem;
-        }
-      }
-
       &.lesson:nth-child(even) {
         background: #ddd
       }
