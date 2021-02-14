@@ -40,7 +40,7 @@ export class LessonsComponent implements OnInit {
   submitNewLesson(input: NewLessonInput): void {
     const { name } = input;
     if (this.course) {
-      this.lessonService.addLesson({
+      this.lessonService.addLesson(this.course, {
         name,
         courseId: this.course.id
       })

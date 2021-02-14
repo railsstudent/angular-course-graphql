@@ -1,7 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
+import { gql } from 'apollo-angular';
 import { Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
-import { AddLessonGQL, AddLessonInput, LessonGQL, CourseGQL } from '../../generated/graphql';
+import { AddLessonGQL, AddLessonInput, LessonGQL, CourseGQL, Course } from '../../generated/graphql';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -12,41 +13,37 @@ export class LessonService implements OnDestroy {
 
   constructor(private addLessonGQL: AddLessonGQL, private lessonGQL: LessonGQL, private courseGQL: CourseGQL) { }
 
-  addLesson(newLesson: AddLessonInput): any {
+  addLesson(course: Course, newLesson: AddLessonInput): any {
     return this.addLessonGQL.mutate({
       newLesson
     }, {
       update: (cache, { data }) => {
-        const args = {
-          offset: 0,
-          limit: 100,
-        };
-
-        const variables = {
-          courseId: newLesson.courseId,
-          args
-        };
-        const query = this.courseGQL.document;
-
-        const options = {
-          query,
-          variables
-        };
-
         const returnedLesson = data?.addLesson;
-        const { course: existingCourse }: any = cache.readQuery(options);
 
-        if (existingCourse) {
-          const course = {
-            ...existingCourse,
-            lessons: [ ...existingCourse.lessons, returnedLesson ]
-          };
-
-          cache.writeQuery({
-            ...options,
-            data: { course }
-          });
-        }
+        cache.modify({
+          id: cache.identify(course),
+          fields: {
+            lessons(existingLessonRefs = [], { readField }): any[] {
+              const newLessonRef = cache.writeFragment({
+                data: returnedLesson,
+                fragment: gql`
+                  fragment NewLesson on Lesson {
+                    id
+                    name
+                  }
+                `
+              });
+              // Quick safety check - if the new lesson is already
+              // present in the cache, we don't need to add it again.
+              if (returnedLesson && existingLessonRefs.some(
+                (ref: any) => readField('id', ref) === returnedLesson.id
+              )) {
+                return existingLessonRefs;
+              }
+              return [...existingLessonRefs, newLessonRef];
+            }
+          }
+        });
       }
     })
     .pipe(
