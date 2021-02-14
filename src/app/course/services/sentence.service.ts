@@ -7,9 +7,7 @@ import { AddSentenceGQL,
   AddTranslationInput,
   AddTranslationGQL,
   TranslationGQL,
-  LessonGQL,
   Sentence,
-  Language,
   DeleteTranslationGQL,
   Lesson
 } from '../../generated/graphql';
@@ -22,7 +20,6 @@ export class SentenceService implements OnDestroy {
 
   constructor(private translationGQL: TranslationGQL, private addSentenceGQL: AddSentenceGQL,
               private addTranslationGQL: AddTranslationGQL,
-              private lessonGQL: LessonGQL,
               private deleteTranslationGQL: DeleteTranslationGQL) { }
 
   getTranslation(sentenceId: string, languageId: string): any {
@@ -43,7 +40,6 @@ export class SentenceService implements OnDestroy {
     }, {
       update: (cache, { data }) => {
         const returnedSentence = data?.addSentence;
-
         cache.modify({
           id: cache.identify(lesson),
           fields: {
@@ -82,7 +78,6 @@ export class SentenceService implements OnDestroy {
     }, {
       update: (cache, { data }) => {
         const returnedTranslation = data?.addTranslation;
-
         cache.modify({
           id: cache.identify(sentence),
           fields: {
@@ -120,67 +115,30 @@ export class SentenceService implements OnDestroy {
     );
   }
 
-  deleteTranslate(input: { lessonId: string, sentenceId: string, translationId: string }): any {
-    const { lessonId, sentenceId, translationId } = input;
-
+  deleteTranslate(sentence: Sentence, translationId: string): any {
     return this.deleteTranslationGQL.mutate({
       id: translationId
     }, {
       update: (cache, { data }) => {
-        const query = this.lessonGQL.document;
         const returnedTranslation = data?.deleteTranslation;
-        const languageId = returnedTranslation?.language?.id;
-        if (!sentenceId && !languageId) {
-          return;
-        }
+        const language = data?.deleteTranslation?.language;
 
-        const options = {
-          query,
-          variables: {
-            lessonId
+        cache.modify({
+          id: cache.identify(sentence),
+          fields: {
+            availableTranslations(existingLanguageRefs = [], { readField }): any[] {
+              return existingLanguageRefs.filter((ref: any) => language?.id !== readField('id', ref));
+            }
           }
-        };
-
-        const { lesson: existingLesson }: any = cache.readQuery(options);
-        const existingSentences: Sentence[] = existingLesson?.sentences || [];
-        const existingSentence = existingSentences.find(item => item.id === sentenceId);
-        if (!existingSentence) {
-          return;
-        }
-
-        const existingTranslations = existingSentence.availableTranslations || [];
-        const availableTranslations = existingTranslations.filter(t => t.id !== languageId);
-        const sentences = existingSentences.map((item: Sentence) =>
-          (item.id !== sentenceId) ? item : {
-            ...item,
-            availableTranslations
-          }
-        );
-
-        const lesson = {
-          ...existingLesson,
-          sentences
-        };
-
-        cache.writeQuery({
-          ...options,
-          data: { lesson }
         });
 
-        // const getTranslationOptions = {
-        //   query: this.translationGQL.document,
-        //   variables: {
-        //     sentenceId,
-        //     languageId
-        //   }
-        // }
-        // const { getTranslation }: any = cache.readQuery(getTranslationOptions);
-        // console.log('x', getTranslation);
-
-        // cache.writeQuery({
-        //   ...getTranslationOptions,
-        //   data: { getTranslation: lesson }
-        // });
+        cache.modify({
+          fields: {
+            translation(existingTranslationRefs = [], { readField }): any[] {
+              return existingTranslationRefs.filter((ref: any) => returnedTranslation?.id !== readField('id', ref));
+            },
+          }
+        });
       }
     })
     .pipe(

@@ -74,17 +74,12 @@ export class SentenceComponent implements OnInit, OnDestroy {
   deleteTranslation(translationId: string): void {
     const answer = confirm('Do you want to delete the translation?');
     if (answer) {
-      if (!this.lessonId) {
-        alert('Lesson id is missing');
-        return;
-      }
-      const sentenceId = this.sentence?.id || '';
-      if (!sentenceId) {
-        alert('Sentence id is missing');
+      if (!this.sentence) {
+        alert('Sentence is missing');
         return;
       }
 
-      this.sentenceService.deleteTranslate({ lessonId: this.lessonId, sentenceId, translationId })
+      this.sentenceService.deleteTranslate(this.sentence, translationId)
         .subscribe((translation: any) => {
           this.translate$.next(null);
           alert(`${translation.text} is deleted`);
