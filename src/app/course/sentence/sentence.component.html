@@ -15,7 +15,8 @@
     <ng-container *ngIf="(translate$ | async) as selectedSentence">
       <div class="p-1 mt-2 mb-2 border border-dashed border-green-500 flex justify-between items-center" *ngIf="selectedTranslation">
         <span>Translation: {{ selectedTranslation?.text || 'no translation' }}</span>
-        <button type="button" class="bg-red-400 rounded-md p-2 inline-flex items-center justify-center text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-600">
+        <button type="button" class="bg-red-400 rounded-md p-2 inline-flex items-center justify-center text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-600"
+          (click)="deleteTranslation(selectedTranslation.id)">
           <span class="sr-only">Close menu</span>
           <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

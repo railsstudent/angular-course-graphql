@@ -29,6 +29,9 @@ export class SentenceComponent implements OnInit, OnDestroy {
   @Input()
   index = 0;
 
+  @Input()
+  lessonId: string | undefined | null = '';
+
   destroy$ = new Subject<boolean>();
   translate$ = new Subject<string | null>();
   selectedTranslation: Translation | null = null;
@@ -45,7 +48,7 @@ export class SentenceComponent implements OnInit, OnDestroy {
             return of(null);
           }
           return this.sentenceService.getTranslation(sentenceId, languageId)
-              .pipe(tag(`get-translation-${sentenceId}-${languageId}`))
+              .pipe(tag(`get-translation-${sentenceId}-${languageId}`));
         }),
         takeUntil(this.destroy$),
         tag('selected-translation')
@@ -66,5 +69,19 @@ export class SentenceComponent implements OnInit, OnDestroy {
 
   showTranslation(availableTranslation: Language): void {
     this.translate$.next(availableTranslation?.id);
+  }
+
+  deleteTranslation(translationId: string): void {
+    const answer = confirm('Do you want to delete the translation?');
+    if (answer) {
+      if (!this.lessonId) {
+        alert('Lesson id is missing');
+        return;
+      }
+      this.sentenceService.deleteTranslate(this.lessonId, translationId)
+        .subscribe((translation: any) => {
+          alert(`${translation.text} is deleted`);
+        }, (err: Error) => alert(err));
+    }
   }
 }

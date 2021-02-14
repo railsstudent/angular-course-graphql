@@ -83,6 +83,7 @@ export type Mutation = {
   addLesson: Lesson;
   addSentence: Sentence;
   addTranslation: Translation;
+  deleteTranslation: Translation;
   updateCourse: Course;
   updateLanguage: Language;
   updateLesson: Lesson;
@@ -112,6 +113,11 @@ export type MutationAddSentenceArgs = {
 
 export type MutationAddTranslationArgs = {
   newTranslation: AddTranslationInput;
+};
+
+
+export type MutationDeleteTranslationArgs = {
+  id: Scalars['String'];
 };
 
 
@@ -383,6 +389,26 @@ export type TranslationQuery = (
   ) }
 );
 
+export type DeleteTranslationMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type DeleteTranslationMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteTranslation: (
+    { __typename?: 'Translation' }
+    & Pick<Translation, 'id' | 'text'>
+    & { sentence?: Maybe<(
+      { __typename?: 'Sentence' }
+      & Pick<Sentence, 'id'>
+    )>, language?: Maybe<(
+      { __typename?: 'Language' }
+      & Pick<Language, 'id'>
+    )> }
+  ) }
+);
+
 export const CourseLanguageFragmentDoc = gql`
     fragment CourseLanguage on Language {
   id
@@ -603,6 +629,31 @@ export const TranslationDocument = gql`
   })
   export class TranslationGQL extends Apollo.Query<TranslationQuery, TranslationQueryVariables> {
     document = TranslationDocument;
+
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const DeleteTranslationDocument = gql`
+    mutation deleteTranslation($id: String!) {
+  deleteTranslation(id: $id) {
+    id
+    text
+    sentence {
+      id
+    }
+    language {
+      id
+    }
+  }
+}
+    `;
+
+@Injectable({
+    providedIn: 'root'
+  })
+  export class DeleteTranslationGQL extends Apollo.Mutation<DeleteTranslationMutation, DeleteTranslationMutationVariables> {
+    document = DeleteTranslationDocument;
 
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

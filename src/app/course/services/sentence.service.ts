@@ -8,7 +8,8 @@ import { AddSentenceGQL,
   TranslationGQL,
   LessonGQL,
   Sentence,
-  Language
+  Language,
+  DeleteTranslationGQL
 } from '../../generated/graphql';
 
 @Injectable({
@@ -19,7 +20,8 @@ export class SentenceService implements OnDestroy {
 
   constructor(private translationGQL: TranslationGQL, private addSentenceGQL: AddSentenceGQL,
               private addTranslationGQL: AddTranslationGQL,
-              private lessonGQL: LessonGQL) { }
+              private lessonGQL: LessonGQL,
+              private deleteTranslationGQL: DeleteTranslationGQL) { }
 
   getTranslation(sentenceId: string, languageId: string): any {
     return this.translationGQL.watch({
@@ -121,6 +123,60 @@ export class SentenceService implements OnDestroy {
     })
     .pipe(
       map(({ data }) => data?.addTranslation),
+      takeUntil(this.destroy$)
+    );
+  }
+
+  deleteTranslate(lessonId: string, translationId: string): any {
+    return this.deleteTranslationGQL.mutate({
+      id: translationId
+    }, {
+      update: (cache, { data }) => {
+        const query = this.lessonGQL.document;
+        const returnedTranslation = data?.deleteTranslation;
+        const languageId = returnedTranslation?.language?.id;
+        const sentenceId = returnedTranslation?.sentence?.id;
+        if (!sentenceId && !languageId) {
+          return;
+        }
+
+        const options = {
+          query,
+          variables: {
+            lessonId
+          }
+        };
+
+        // const { sentenceId } = newTranslation;
+        const { lesson: existingLesson }: any = cache.readQuery(options);
+        const existingSentences: Sentence[] = existingLesson?.sentences || [];
+        const existingSentence = existingSentences.find(item => item.id === sentenceId);
+        if (!existingSentence) {
+          return;
+        }
+
+        const existingTranslations = existingSentence.availableTranslations || [];
+        const availableTranslations = existingTranslations.filter(t => t.id !== languageId);
+        const sentences = existingSentences.map((item: Sentence) =>
+          (item.id !== sentenceId) ? item : {
+            ...item,
+            availableTranslations
+          }
+        );
+
+        const lesson = {
+          ...existingLesson,
+          sentences
+        };
+
+        cache.writeQuery({
+          ...options,
+          data: { lesson }
+        });
+      }
+    })
+    .pipe(
+      map(({ data }) => data?.deleteTranslation),
       takeUntil(this.destroy$)
     );
   }

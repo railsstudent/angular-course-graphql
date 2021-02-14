@@ -69,3 +69,16 @@ query Translation($sentenceId: String!, $languageId: String!) {
     ...TranslationText
   }
 }
+
+mutation deleteTranslation ($id: String!) {
+  deleteTranslation (id: $id) {
+    id
+    text
+    sentence {
+      id
+    }
+    language {
+      id
+    }
+  }
+}

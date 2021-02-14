@@ -25,7 +25,7 @@
     <p class="title mb-4">Sentences</p>
     <div class="sentences" *ngIf="lesson && lesson.sentences && lesson.sentences.length > 0 else noSentence">
       <ng-container *ngFor="let sentence of lesson.sentences; index as i; trackBy:trackByFunc">
-        <app-sentence class="mb-4" [sentence]="sentence" [index]="i"></app-sentence>
+        <app-sentence class="mb-4" [sentence]="sentence" [index]="i" [lessonId]="lesson?.id"></app-sentence>
       </ng-container>
     </div>
   </div>
