@@ -147,7 +147,6 @@ export class SentenceService implements OnDestroy {
           }
         };
 
-        // const { sentenceId } = newTranslation;
         const { lesson: existingLesson }: any = cache.readQuery(options);
         const existingSentences: Sentence[] = existingLesson?.sentences || [];
         const existingSentence = existingSentences.find(item => item.id === sentenceId);
