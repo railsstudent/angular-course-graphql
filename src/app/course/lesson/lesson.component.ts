@@ -61,9 +61,13 @@ export class LessonComponent implements OnInit {
 
   submitNewTranslation(newInput: NewTranslationInput): void {
     if (newInput && this.lesson) {
-      const lessonId = this.lesson.id;
+      const sentence = (this.lesson?.sentences || []).find(s => s.id === newInput.sentenceId);
+      if (!sentence) {
+        alert('Sentence does not exist');
+        return;
+      }
       this.sentenceService
-        .addTranslate(lessonId, newInput)
+        .addTranslate(sentence, newInput)
         .subscribe((addTranslation: Translation) => {
           if (addTranslation) {
             alert(`${addTranslation.text} is added.`);

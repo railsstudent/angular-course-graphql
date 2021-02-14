@@ -76,54 +76,41 @@ export class SentenceService implements OnDestroy {
     );
   }
 
-  addTranslate(lessonId: string, newTranslation: AddTranslationInput): any {
+  addTranslate(sentence: Sentence, newTranslation: AddTranslationInput): any {
     return this.addTranslationGQL.mutate({
       newTranslation
     }, {
       update: (cache, { data }) => {
-        const query = this.lessonGQL.document;
-        const returnedLanguage: Language | undefined | null = data?.addTranslation?.language;
-        if (!returnedLanguage) {
-          return;
-        }
+        const returnedTranslation = data?.addTranslation;
 
-        const options = {
-          query,
-          variables: {
-            lessonId
+        cache.modify({
+          id: cache.identify(sentence),
+          fields: {
+            availableTranslations(existingLanguageRefs = [], { readField }): any[] {
+              const newLanguageRef = cache.writeFragment({
+                data: returnedTranslation,
+                fragment: gql`
+                  fragment NewLanguage on Language {
+                    id
+                    name
+                  }
+                `
+              });
+              // Quick safety check - if the new language is already
+              // present in the cache, we don't need to add it again.
+              if (returnedTranslation && existingLanguageRefs.some(
+                (ref: any) => readField('id', ref) === returnedTranslation.id
+              )) {
+                return existingLanguageRefs;
+              }
+              return [...existingLanguageRefs, newLanguageRef]
+                .sort((a, b) => {
+                  const aName = a.name || '';
+                  const bName = b.name || '';
+                  return aName.localeCompare(bName);
+                });
+            }
           }
-        };
-
-        const { sentenceId } = newTranslation;
-        const { lesson: existingLesson }: any = cache.readQuery(options);
-        const existingSentences: Sentence[] = existingLesson?.sentences || [];
-        const existingSentence = existingSentences.find(item => item.id === sentenceId);
-        if (!existingSentence) {
-          return;
-        }
-
-        const existingTranslations = existingSentence.availableTranslations || [];
-        const availableTranslations = [...existingTranslations, returnedLanguage]
-          .sort((a, b) => {
-            const aName = a.name || '';
-            const bName = b.name || '';
-            return aName.localeCompare(bName);
-          });
-        const sentences = existingSentences.map((item: Sentence) =>
-          (item.id !== sentenceId) ? item : {
-            ...item,
-            availableTranslations
-          }
-        );
-
-        const lesson = {
-          ...existingLesson,
-          sentences
-        };
-
-        cache.writeQuery({
-          ...options,
-          data: { lesson }
         });
       }
     })
