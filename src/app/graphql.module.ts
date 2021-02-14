@@ -13,7 +13,14 @@ export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
         Sentence: {
           fields: {
             availableTranslations: {
-              merge: false,
+              merge(existing: any[], incoming: any[]): any[] {
+                console.log('existing', existing, 'incoming', incoming);
+                // // return [...incoming];
+                // const merged = existing ? existing.slice(0) : [];
+                // const existingIdSet = new Set(
+                //   merged.map(language => readField('id', language)));
+                return [...incoming];
+              }
             }
           }
         }

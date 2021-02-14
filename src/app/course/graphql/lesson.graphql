@@ -67,18 +67,17 @@ mutation addTranslation($newTranslation: AddTranslationInput!) {
 query Translation($sentenceId: String!, $languageId: String!) {
   getTranslation(sentenceId: $sentenceId, languageId: $languageId) {
     ...TranslationText
+    language {
+      ...CourseLanguage
+    }
   }
 }
 
 mutation deleteTranslation ($id: String!) {
   deleteTranslation (id: $id) {
-    id
-    text
-    sentence {
-      id
-    }
+    ...TranslationText
     language {
-      id
+      ...CourseLanguage
     }
   }
 }

@@ -1,4 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
+import { gql } from 'apollo-angular';
 import { Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { AddSentenceGQL,
@@ -9,7 +10,8 @@ import { AddSentenceGQL,
   LessonGQL,
   Sentence,
   Language,
-  DeleteTranslationGQL
+  DeleteTranslationGQL,
+  Lesson
 } from '../../generated/graphql';
 
 @Injectable({
@@ -35,32 +37,36 @@ export class SentenceService implements OnDestroy {
     );
   }
 
-  addSentence(newSentence: AddSentenceInput): any {
+  addSentence(lesson: Lesson, newSentence: AddSentenceInput): any {
     return this.addSentenceGQL.mutate({
       newSentence
     }, {
       update: (cache, { data }) => {
-        const query = this.lessonGQL.document;
         const returnedSentence = data?.addSentence;
 
-        const options = {
-          query,
-          variables: {
-            lessonId: newSentence.lessonId
+        cache.modify({
+          id: cache.identify(lesson),
+          fields: {
+            sentences(existingSentenceRefs = [], { readField }): any[] {
+              const newSentenceRef = cache.writeFragment({
+                data: returnedSentence,
+                fragment: gql`
+                  fragment NewSentence on Sentence {
+                    id
+                    text
+                  }
+                `
+              });
+              // Quick safety check - if the new sentence is already
+              // present in the cache, we don't need to add it again.
+              if (returnedSentence && existingSentenceRefs.some(
+                (ref: any) => readField('id', ref) === returnedSentence.id
+              )) {
+                return existingSentenceRefs;
+              }
+              return [...existingSentenceRefs, newSentenceRef];
+            }
           }
-        };
-
-        const { lesson: existingLesson }: any = cache.readQuery(options);
-        const { sentences: existingSentences } = existingLesson;
-        const sentences = [ ...existingSentences, returnedSentence ];
-        const lesson = {
-          ...existingLesson,
-          sentences
-        };
-
-        cache.writeQuery({
-          ...options,
-          data: { lesson }
         });
       }
     })
@@ -127,7 +133,9 @@ export class SentenceService implements OnDestroy {
     );
   }
 
-  deleteTranslate(lessonId: string, translationId: string): any {
+  deleteTranslate(input: { lessonId: string, sentenceId: string, translationId: string }): any {
+    const { lessonId, sentenceId, translationId } = input;
+
     return this.deleteTranslationGQL.mutate({
       id: translationId
     }, {
@@ -135,7 +143,6 @@ export class SentenceService implements OnDestroy {
         const query = this.lessonGQL.document;
         const returnedTranslation = data?.deleteTranslation;
         const languageId = returnedTranslation?.language?.id;
-        const sentenceId = returnedTranslation?.sentence?.id;
         if (!sentenceId && !languageId) {
           return;
         }
@@ -172,6 +179,21 @@ export class SentenceService implements OnDestroy {
           ...options,
           data: { lesson }
         });
+
+        // const getTranslationOptions = {
+        //   query: this.translationGQL.document,
+        //   variables: {
+        //     sentenceId,
+        //     languageId
+        //   }
+        // }
+        // const { getTranslation }: any = cache.readQuery(getTranslationOptions);
+        // console.log('x', getTranslation);
+
+        // cache.writeQuery({
+        //   ...getTranslationOptions,
+        //   data: { getTranslation: lesson }
+        // });
       }
     })
     .pipe(

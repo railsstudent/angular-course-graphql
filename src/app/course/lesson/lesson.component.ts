@@ -50,7 +50,7 @@ export class LessonComponent implements OnInit {
 
     if (this.lesson) {
       this.sentenceService
-        .addSentence({ text, lessonId: this.lesson.id })
+        .addSentence(this.lesson, { text, lessonId: this.lesson.id })
         .subscribe((addSentence: Sentence) => {
           if (addSentence) {
             alert(`${addSentence.text} is added.`);

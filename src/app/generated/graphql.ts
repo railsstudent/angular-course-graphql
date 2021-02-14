@@ -385,6 +385,10 @@ export type TranslationQuery = (
   { __typename?: 'Query' }
   & { getTranslation: (
     { __typename?: 'Translation' }
+    & { language?: Maybe<(
+      { __typename?: 'Language' }
+      & CourseLanguageFragment
+    )> }
     & TranslationTextFragment
   ) }
 );
@@ -398,14 +402,11 @@ export type DeleteTranslationMutation = (
   { __typename?: 'Mutation' }
   & { deleteTranslation: (
     { __typename?: 'Translation' }
-    & Pick<Translation, 'id' | 'text'>
-    & { sentence?: Maybe<(
-      { __typename?: 'Sentence' }
-      & Pick<Sentence, 'id'>
-    )>, language?: Maybe<(
+    & { language?: Maybe<(
       { __typename?: 'Language' }
-      & Pick<Language, 'id'>
+      & CourseLanguageFragment
     )> }
+    & TranslationTextFragment
   ) }
 );
 
@@ -620,9 +621,13 @@ export const TranslationDocument = gql`
     query Translation($sentenceId: String!, $languageId: String!) {
   getTranslation(sentenceId: $sentenceId, languageId: $languageId) {
     ...TranslationText
+    language {
+      ...CourseLanguage
+    }
   }
 }
-    ${TranslationTextFragmentDoc}`;
+    ${TranslationTextFragmentDoc}
+${CourseLanguageFragmentDoc}`;
 
 @Injectable({
     providedIn: 'root'
@@ -637,17 +642,14 @@ export const TranslationDocument = gql`
 export const DeleteTranslationDocument = gql`
     mutation deleteTranslation($id: String!) {
   deleteTranslation(id: $id) {
-    id
-    text
-    sentence {
-      id
-    }
+    ...TranslationText
     language {
-      id
+      ...CourseLanguage
     }
   }
 }
-    `;
+    ${TranslationTextFragmentDoc}
+${CourseLanguageFragmentDoc}`;
 
 @Injectable({
     providedIn: 'root'
