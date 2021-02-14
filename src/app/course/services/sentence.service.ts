@@ -132,13 +132,11 @@ export class SentenceService implements OnDestroy {
           }
         });
 
-        cache.modify({
-          fields: {
-            translation(existingTranslationRefs = [], { readField }): any[] {
-              return existingTranslationRefs.filter((ref: any) => returnedTranslation?.id !== readField('id', ref));
-            },
-          }
-        });
+        if (returnedTranslation) {
+          const evictedId = cache.identify(returnedTranslation);
+          cache.evict({ id: evictedId });
+          cache.gc();
+        }
       }
     })
     .pipe(
