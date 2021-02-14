@@ -1,9 +1,14 @@
-import { Translation } from './../../generated/graphql';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { combineLatest, Subject } from 'rxjs';
-import { Language, Sentence } from '../../generated/graphql';
-import { distinctUntilChanged, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
+import { Language, Sentence, Translation } from '../../generated/graphql';
 import { SentenceService } from '../services';
+import { tag } from 'rxjs-spy/operators/tag';
+import { create } from 'rxjs-spy';
+const spy = create();
+spy.log(/get-translation-.+/);
+spy.log('selected-translation');
+spy.log(/null-translation-.+/);
 
 @Component({
   selector: 'app-sentence',
@@ -25,26 +30,29 @@ export class SentenceComponent implements OnInit, OnDestroy {
   index = 0;
 
   destroy$ = new Subject<boolean>();
-  sentence$ = new Subject<string>();
-  translationLanguage$ = new Subject<string>();
-  selectedTranslation: Translation | undefined = undefined;
+  translate$ = new Subject<string | null>();
+  selectedTranslation: Translation | null = null;
 
   constructor(private sentenceService: SentenceService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    combineLatest([this.sentence$, this.translationLanguage$])
-    .pipe(
-      distinctUntilChanged((a: [string, string], b: [string, string]) =>
-        a[0] === b[0] && a[1] === b[1]
-      ),
-      switchMap(([sentenceId, languageId]) =>
-        this.sentenceService.getTranslation(sentenceId, languageId)
-      ),
-      takeUntil(this.destroy$)
-    ).subscribe((translation: any) => {
-      this.selectedTranslation = translation as Translation;
-      this.cdr.markForCheck();
-    }, (err) => alert(err));
+    this.translate$
+      .pipe(
+        distinctUntilChanged(),
+        switchMap((languageId) => {
+          const sentenceId = this.sentence?.id || '';
+          if (!sentenceId || !languageId) {
+            return of(null);
+          }
+          return this.sentenceService.getTranslation(sentenceId, languageId)
+              .pipe(tag(`get-translation-${sentenceId}-${languageId}`))
+        }),
+        takeUntil(this.destroy$),
+        tag('selected-translation')
+      ).subscribe((translation: any) => {
+        this.selectedTranslation = translation as Translation;
+        this.cdr.markForCheck();
+      }, (err) => alert(err));
   }
 
   ngOnDestroy(): void {
@@ -56,8 +64,7 @@ export class SentenceComponent implements OnInit, OnDestroy {
     return availableTranslation.id;
   }
 
-  showTranslation(sentence: Sentence, availableTranslation: Language): void {
-    this.sentence$.next(sentence?.id);
-    this.translationLanguage$.next(availableTranslation?.id);
+  showTranslation(availableTranslation: Language): void {
+    this.translate$.next(availableTranslation?.id);
   }
 }

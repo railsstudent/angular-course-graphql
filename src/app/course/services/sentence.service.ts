@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
-import { map, startWith, takeUntil } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import { AddSentenceGQL,
   AddSentenceInput,
   AddTranslationInput,
@@ -29,7 +29,6 @@ export class SentenceService implements OnDestroy {
     .valueChanges
     .pipe(
       map(({ data }) => data.getTranslation),
-      startWith(undefined),
       takeUntil(this.destroy$)
     );
   }
@@ -129,5 +128,6 @@ export class SentenceService implements OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next(true);
     this.destroy$.unsubscribe();
+    console.log('sentence service - ngOnDestroy fired');
   }
 }
