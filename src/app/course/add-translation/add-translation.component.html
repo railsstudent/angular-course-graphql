@@ -10,7 +10,7 @@
     <label class="label">
       <span class="field">Language:</span>
       <select formControlName="languageId" style="min-width: 100px;">
-        <option [value]="language.id" *ngFor="let language of languages">{{ language.name }} ({{ language.nativeName }})</option>
+        <option [value]="language.id" *ngFor="let language of languages">{{ language.fullname }}</option>
       </select>
     </label>
     <label class="label">

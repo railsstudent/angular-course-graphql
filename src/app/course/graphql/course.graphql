@@ -1,7 +1,7 @@
 fragment CourseLanguage on Language {
   id
   name
-  nativeName
+  fullname
 }
 
 fragment CourseName on Course {

@@ -6,7 +6,7 @@
     <span class="field">Description: </span><span>{{ course?.description }}</span>
   </p>
   <p>
-    <span class="field">Language: </span><span>{{ course?.language?.name }} ({{ course?.language?.nativeName }})</span>
+    <span class="field">Language: </span><span>{{ course?.language?.fullname }}</span>
   </p>
   <p class="actions">
     <button class="bg-green-400 hover:bg-green-500" (click)="viewLesson()">See Lessons</button>

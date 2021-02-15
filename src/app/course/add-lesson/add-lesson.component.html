@@ -3,7 +3,7 @@
   <form class="flex flex-col" [formGroup]="form" novalidate (ngSubmit)="onSubmit($event)">
     <label class="label">
       <span class="field">Language:</span>
-      <span>{{ language?.name }} ({{ language?.nativeName }})</span>
+      <span>{{ language?.fullname }}</span>
     </label>
     <label class="label">
       <span class="field">Name:</span>
