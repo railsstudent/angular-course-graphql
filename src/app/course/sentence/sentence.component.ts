@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject, of } from 'rxjs';
 import { distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
-import { Language, Sentence, Translation } from '../../generated/graphql';
+import { Language, Lesson, Sentence, Translation } from '../../generated/graphql';
 import { SentenceService } from '../services';
 import { tag } from 'rxjs-spy/operators/tag';
 import { create } from 'rxjs-spy';
@@ -30,7 +30,7 @@ export class SentenceComponent implements OnInit, OnDestroy {
   index = 0;
 
   @Input()
-  lessonId: string | undefined | null = '';
+  lesson: Lesson | undefined | null = null;
 
   destroy$ = new Subject<boolean>();
   translate$ = new Subject<string | null>();
@@ -85,5 +85,16 @@ export class SentenceComponent implements OnInit, OnDestroy {
           alert(`${translation.text} is deleted`);
         }, (err: Error) => alert(err));
     }
+  }
+
+  deleteSentence(sentenceId: string): void {
+    if (!sentenceId || !this.lesson) {
+      return
+    }
+
+    this.sentenceService.deleteSentence(this.lesson, sentenceId)
+      .subscribe((sentence: any) => {
+        alert(`${sentence.text} is deleted`);
+      }, (err: Error) => alert(err));
   }
 }
