@@ -20,6 +20,11 @@ fragment TranslationText on Translation {
   text
 }
 
+fragment SentenceText on Sentence {
+  id
+  text
+}
+
 query Lesson ($lessonId: String!)  {
   lesson(id: $lessonId) {
     ...LessonName
@@ -50,8 +55,18 @@ mutation addLesson($newLesson: AddLessonInput!) {
 
 mutation addSentence($newSentence: AddSentenceInput!) {
   addSentence (newSentence: $newSentence) {
-    id
-    text
+    ...SentenceText
+  }
+}
+
+mutation deleteSentence ($id: String!) {
+  deleteSentence(id: $id) {
+    sentence {
+   	  ...SentenceText
+    }
+    translations {
+      ...TranslationText
+    }
   }
 }
 
