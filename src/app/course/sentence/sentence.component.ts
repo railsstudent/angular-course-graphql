@@ -92,6 +92,11 @@ export class SentenceComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const answer = confirm('Do you want to delete the sentence?');
+    if (!answer) {
+      return;
+    }
+
     this.sentenceService.deleteSentence(this.lesson, sentenceId)
       .subscribe((sentence: any) => {
         alert(`${sentence.text} is deleted`);
