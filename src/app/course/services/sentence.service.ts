@@ -9,7 +9,8 @@ import { AddSentenceGQL,
   TranslationGQL,
   Sentence,
   DeleteTranslationGQL,
-  Lesson
+  Lesson,
+  DeleteSentenceGQL
 } from '../../generated/graphql';
 
 @Injectable({
@@ -20,7 +21,8 @@ export class SentenceService implements OnDestroy {
 
   constructor(private translationGQL: TranslationGQL, private addSentenceGQL: AddSentenceGQL,
               private addTranslationGQL: AddTranslationGQL,
-              private deleteTranslationGQL: DeleteTranslationGQL) { }
+              private deleteTranslationGQL: DeleteTranslationGQL,
+              private deleteSetenceGQL: DeleteSentenceGQL) { }
 
   getTranslation(sentenceId: string, languageId: string): any {
     return this.translationGQL.watch({
@@ -68,6 +70,37 @@ export class SentenceService implements OnDestroy {
     })
     .pipe(
       map(({ data }) => data?.addSentence),
+      takeUntil(this.destroy$)
+    );
+  }
+
+  deleteSentence(lesson: Lesson, sentenceId: string): any {
+    return this.deleteSetenceGQL.mutate({
+      id: sentenceId
+    }, {
+      update: (cache, { data }) => {
+        const returnedSentence = data?.deleteSentence;
+        const sentence = returnedSentence?.sentence
+        const translations = returnedSentence?.translations || []
+        cache.modify({
+          id: cache.identify(lesson),
+          fields: {
+            sentences(existingSentenceRefs = [], { readField }): any[] {
+              return existingSentenceRefs.filter((ref: any) => sentence?.id !== readField('id', ref))
+            }
+          }
+        });
+
+        if (translations && translations.length > 0) {
+          for (const translation of translations) {
+            cache.evict({ id: translation.id })
+          }
+          cache.gc()
+        }
+      }
+    })
+    .pipe(
+      map(({ data }) => data?.deleteSentence),
       takeUntil(this.destroy$)
     );
   }
