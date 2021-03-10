@@ -80,27 +80,27 @@ export class SentenceService implements OnDestroy {
     }, {
       update: (cache, { data }) => {
         const returnedSentence = data?.deleteSentence;
-        const sentence = returnedSentence?.sentence
-        const translations = returnedSentence?.translations || []
+        const sentence = returnedSentence?.sentence;
+        const translations = returnedSentence?.translations || [];
         cache.modify({
           id: cache.identify(lesson),
           fields: {
             sentences(existingSentenceRefs = [], { readField }): any[] {
-              return existingSentenceRefs.filter((ref: any) => sentence?.id !== readField('id', ref))
+              return existingSentenceRefs.filter((ref: any) => sentence?.id !== readField('id', ref));
             }
           }
         });
 
         if (translations && translations.length > 0) {
           for (const translation of translations) {
-            cache.evict({ id: translation.id })
+            cache.evict({ id: translation.id });
           }
-          cache.gc()
+          cache.gc();
         }
       }
     })
     .pipe(
-      map(({ data }) => data?.deleteSentence),
+      map(({ data }) => data?.deleteSentence?.sentence),
       takeUntil(this.destroy$)
     );
   }

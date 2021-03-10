@@ -89,7 +89,7 @@ export class SentenceComponent implements OnInit, OnDestroy {
 
   deleteSentence(sentenceId: string): void {
     if (!sentenceId || !this.lesson) {
-      return
+      return;
     }
 
     this.sentenceService.deleteSentence(this.lesson, sentenceId)
