@@ -31,14 +31,18 @@ export class LessonComponent implements OnInit {
         return lessonId ? this.lessonService.getLesson(lessonId) : EMPTY;
       })
     );
+    const langs$ = this.courseService.getLanguages();
 
-    combineLatest([lesson$, this.courseService.getLanguages()])
-      .subscribe(([lesson, languages]: any) => {
-        this.lesson = lesson as Lesson;
-        const language = lesson?.course?.language;
-        this.languages = language ? languages.filter((item: Language) => item.id !== language.id) : languages;
-        this.cdr.markForCheck();
-      }, (err) => alert(err));
+    combineLatest([lesson$, langs$])
+      .subscribe({
+        next: ([lesson, languages]: any) => {
+          this.lesson = lesson as Lesson;
+          const language = lesson?.course?.language;
+          this.languages = language ? languages.filter((item: Language) => item.id !== language.id) : languages;
+          this.cdr.markForCheck();
+        },
+        error: (err) => alert(err)
+      });
   }
 
   trackByFunc(index: number, sentence: Sentence): string {
@@ -51,11 +55,14 @@ export class LessonComponent implements OnInit {
     if (this.lesson) {
       this.sentenceService
         .addSentence(this.lesson, { text, lessonId: this.lesson.id })
-        .subscribe((addSentence: Sentence) => {
-          if (addSentence) {
-            alert(`${addSentence.text} is added.`);
-          }
-        }, (err: Error) => alert(err));
+        .subscribe({
+          next: (addSentence: Sentence) => {
+            if (addSentence) {
+              alert(`${addSentence.text} is added.`);
+            }
+          },
+          error: (err: Error) => alert(err)
+        });
     }
   }
 
@@ -68,11 +75,14 @@ export class LessonComponent implements OnInit {
       }
       this.sentenceService
         .addTranslate(sentence, newInput)
-        .subscribe((addTranslation: Translation) => {
-          if (addTranslation) {
-            alert(`${addTranslation.text} is added.`);
-          }
-        }, (err: Error) => alert(err));
+        .subscribe({
+          next: (addTranslation: Translation) => {
+            if (addTranslation) {
+              alert(`${addTranslation.text} is added.`);
+            }
+          },
+          error: (err: Error) => alert(err)
+        });
     }
   }
 }

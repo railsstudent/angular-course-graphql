@@ -26,11 +26,14 @@ export class LessonsComponent implements OnInit {
         const courseId = params.get('id');
         return courseId ? this.courseService.getCourse(courseId) : undefined;
       }),
-    ).subscribe((course: any) => {
-      this.course = course as Course;
-      this.lessons = course?.lessons || [];
-      this.cdr.markForCheck();
-    }, (err: Error) => alert(err));
+    ).subscribe({
+      next: (course: any) => {
+        this.course = course as Course;
+        this.lessons = course?.lessons || [];
+        this.cdr.markForCheck();
+      },
+      error: (err: Error) => alert(err),
+    });
   }
 
   trackByFunc(index: number, lesson: Lesson): string {
@@ -44,11 +47,14 @@ export class LessonsComponent implements OnInit {
         name,
         courseId: this.course.id
       })
-      .subscribe((addLesson: Lesson) => {
-        if (addLesson) {
-          alert(`${addLesson.name} is added.`);
-        }
-      }, (err: Error) => alert(err));
+      .subscribe({
+        next: (addLesson: Lesson) => {
+          if (addLesson) {
+            alert(`${addLesson.name} is added.`);
+          }
+        },
+        error: (err: Error) => alert(err)
+      });
     }
   }
 }

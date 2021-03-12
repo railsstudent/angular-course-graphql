@@ -52,10 +52,13 @@ export class SentenceComponent implements OnInit, OnDestroy {
         }),
         takeUntil(this.destroy$),
         tag('selected-translation')
-      ).subscribe((translation: any) => {
-        this.selectedTranslation = translation as Translation;
-        this.cdr.markForCheck();
-      }, (err) => alert(err));
+      ).subscribe({
+        next: (translation: any) => {
+          this.selectedTranslation = translation as Translation;
+          this.cdr.markForCheck();
+        },
+        error: (err) => alert(err)
+      });
   }
 
   ngOnDestroy(): void {
@@ -80,10 +83,13 @@ export class SentenceComponent implements OnInit, OnDestroy {
       }
 
       this.sentenceService.deleteTranslate(this.sentence, translationId)
-        .subscribe((translation: any) => {
-          this.translate$.next(null);
-          alert(`${translation.text} is deleted`);
-        }, (err: Error) => alert(err));
+        .subscribe({
+          next: (translation: any) => {
+            this.translate$.next(null);
+            alert(`${translation.text} is deleted`);
+          },
+          error: (err: Error) => alert(err)
+        });
     }
   }
 
@@ -98,8 +104,11 @@ export class SentenceComponent implements OnInit, OnDestroy {
     }
 
     this.sentenceService.deleteSentence(this.lesson, sentenceId)
-      .subscribe((sentence: any) => {
-        alert(`${sentence.text} is deleted`);
-      }, (err: Error) => alert(err));
+      .subscribe({
+        next: (sentence: any) => {
+          alert(`${sentence.text} is deleted`);
+        },
+        error: (err: Error) => alert(err)
+      });
   }
 }

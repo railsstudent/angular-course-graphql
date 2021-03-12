@@ -18,15 +18,19 @@ export class CourseListComponent implements OnInit {
 
   ngOnInit(): void {
     this.service.getAllCourses()
-      .subscribe((courses: Course[]) => {
-        this.courses = courses;
-        this.cdr.markForCheck();
+      .subscribe({
+        next: (courses: Course[]) => {
+          this.courses = courses;
+          this.cdr.markForCheck();
+        }
       });
 
     this.service.getLanguages()
-      .subscribe((languages: Language[]) => {
-        this.languages = languages;
-        this.cdr.markForCheck();
+      .subscribe({
+        next: (languages: Language[]) => {
+          this.languages = languages;
+          this.cdr.markForCheck();
+        }
       });
   }
 
@@ -36,10 +40,13 @@ export class CourseListComponent implements OnInit {
 
   submitNewCourse(newCourse: NewCourseInput): void {
     this.service.addCourse(newCourse)
-    .subscribe((addCourse: Course | undefined | null) => {
-      if (addCourse) {
-        alert(`${addCourse.name} is added.`);
-      }
-    }, (err: Error) => alert(err));
+    .subscribe({
+      next: (addCourse: Course | undefined | null) => {
+        if (addCourse) {
+          alert(`${addCourse.name} is added.`);
+        }
+      },
+      error: (err: Error) => alert(err)
+    });
   }
 }
