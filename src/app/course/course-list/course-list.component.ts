@@ -11,7 +11,7 @@ import { CourseService } from '../services';
 })
 export class CourseListComponent implements OnInit {
   courses: Course[] | undefined | null = [];
-  languages: Language[] = [];
+  languages$!: any;
 
   constructor(private service: CourseService,
               private cdr: ChangeDetectorRef) { }
@@ -25,13 +25,7 @@ export class CourseListComponent implements OnInit {
         }
       });
 
-    this.service.getLanguages()
-      .subscribe({
-        next: (languages: Language[]) => {
-          this.languages = languages;
-          this.cdr.markForCheck();
-        }
-      });
+    this.languages$ = this.service.getLanguages();
   }
 
   trackByFunc(index: number, course: Course): string {
@@ -40,13 +34,13 @@ export class CourseListComponent implements OnInit {
 
   submitNewCourse(newCourse: NewCourseInput): void {
     this.service.addCourse(newCourse)
-    .subscribe({
-      next: (addCourse: Course | undefined | null) => {
-        if (addCourse) {
-          alert(`${addCourse.name} is added.`);
-        }
-      },
-      error: (err: Error) => alert(err)
-    });
+      .subscribe({
+        next: (addCourse: Course | undefined | null) => {
+          if (addCourse) {
+            alert(`${addCourse.name} is added.`);
+          }
+        },
+        error: (err: Error) => alert(err)
+      });
   }
 }

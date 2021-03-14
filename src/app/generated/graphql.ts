@@ -492,7 +492,7 @@ export const AllCoursesDocument = gql`
     ${CourseNameFragmentDoc}
 ${CourseLanguageFragmentDoc}`;
 
-  @Injectable({
+@Injectable({
     providedIn: 'root'
   })
   export class AllCoursesGQL extends Apollo.Query<AllCoursesQuery, AllCoursesQueryVariables> {
@@ -518,7 +518,7 @@ export const CourseDocument = gql`
     ${CourseNameFragmentDoc}
 ${CourseLanguageFragmentDoc}`;
 
-  @Injectable({
+@Injectable({
     providedIn: 'root'
   })
   export class CourseGQL extends Apollo.Query<CourseQuery, CourseQueryVariables> {
@@ -536,7 +536,7 @@ export const LanguagesDocument = gql`
 }
     ${CourseLanguageFragmentDoc}`;
 
-  @Injectable({
+@Injectable({
     providedIn: 'root'
   })
   export class LanguagesGQL extends Apollo.Query<LanguagesQuery, LanguagesQueryVariables> {
@@ -558,7 +558,7 @@ export const AddCourseDocument = gql`
     ${CourseNameFragmentDoc}
 ${CourseLanguageFragmentDoc}`;
 
-  @Injectable({
+@Injectable({
     providedIn: 'root'
   })
   export class AddCourseGQL extends Apollo.Mutation<AddCourseMutation, AddCourseMutationVariables> {
@@ -592,7 +592,7 @@ export const LessonDocument = gql`
 ${CourseNameFragmentDoc}
 ${CourseLanguageFragmentDoc}`;
 
-  @Injectable({
+@Injectable({
     providedIn: 'root'
   })
   export class LessonGQL extends Apollo.Query<LessonQuery, LessonQueryVariables> {
@@ -610,7 +610,7 @@ export const AddLessonDocument = gql`
 }
     ${LessonNameFragmentDoc}`;
 
-  @Injectable({
+@Injectable({
     providedIn: 'root'
   })
   export class AddLessonGQL extends Apollo.Mutation<AddLessonMutation, AddLessonMutationVariables> {
@@ -628,7 +628,7 @@ export const AddSentenceDocument = gql`
 }
     ${SentenceTextFragmentDoc}`;
 
-  @Injectable({
+@Injectable({
     providedIn: 'root'
   })
   export class AddSentenceGQL extends Apollo.Mutation<AddSentenceMutation, AddSentenceMutationVariables> {
@@ -652,7 +652,7 @@ export const DeleteSentenceDocument = gql`
     ${SentenceTextFragmentDoc}
 ${TranslationTextFragmentDoc}`;
 
-  @Injectable({
+@Injectable({
     providedIn: 'root'
   })
   export class DeleteSentenceGQL extends Apollo.Mutation<DeleteSentenceMutation, DeleteSentenceMutationVariables> {
@@ -674,7 +674,7 @@ export const AddTranslationDocument = gql`
     ${TranslationTextFragmentDoc}
 ${CourseLanguageFragmentDoc}`;
 
-  @Injectable({
+@Injectable({
     providedIn: 'root'
   })
   export class AddTranslationGQL extends Apollo.Mutation<AddTranslationMutation, AddTranslationMutationVariables> {
