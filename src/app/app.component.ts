@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'angular-course-graphql';
+  constructor(titleService: Title) {
+    titleService.setTitle('Spanish Notes App')
+  }
 }
