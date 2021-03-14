@@ -7,6 +7,6 @@ import { Title } from '@angular/platform-browser';
 })
 export class AppComponent {
   constructor(titleService: Title) {
-    titleService.setTitle('Spanish Notes App')
+    titleService.setTitle('Spanish Notes App');
   }
 }

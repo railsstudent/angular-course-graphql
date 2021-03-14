@@ -13,10 +13,7 @@
 
     &-container {
       flex: 0 1 calc(100% / 4);
-    }
-
-    &-card {
-      flex-basis: 0 1 25%;
+      margin-bottom: 0.5rem;
     }
   }
 }
