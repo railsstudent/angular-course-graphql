@@ -1,5 +1,11 @@
 <div class="container p-2">
   <app-add-course class="ml-2 mr-2" [languages]="(languages$ | async) || []" (submitNewCourse)="submitNewCourse($event)"></app-add-course>
+  <app-alert-error *ngIf="(errMsg$ | async) as msg">
+    <span class="text-red-800">{{ msg }}</span>
+  </app-alert-error>
+  <app-alert-success *ngIf="(successMsg$ | async) as msg">
+    <span class="text-green-800">{{ msg }}</span>
+  </app-alert-success>
   <div class="course-list flex" *ngIf="courses else noCourse">
     <div class="course-container" *ngFor="let course of courses; trackBy:trackByFunc">
       <app-course-card class="course-card m-2" [course]="course"></app-course-card>

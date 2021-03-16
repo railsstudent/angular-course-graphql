@@ -11,6 +11,7 @@ import { AddLessonComponent } from './add-lesson/add-lesson.component';
 import { AddSentenceComponent } from './add-sentence/add-sentence.component';
 import { AddTranslationComponent } from './add-translation/add-translation.component';
 import { SentenceComponent } from './sentence/sentence.component';
+import { SharedModule } from '../shared';
 
 @NgModule({
   declarations: [CourseListComponent,
@@ -27,6 +28,7 @@ import { SentenceComponent } from './sentence/sentence.component';
     CourseRoutingModule,
     ReactiveFormsModule,
     FormsModule,
+    SharedModule
   ]
 })
 export class CourseModule { }

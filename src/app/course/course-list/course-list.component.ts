@@ -1,7 +1,8 @@
-import { NewCourseInput } from './../type';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Course, Language } from '../../generated/graphql';
+import { Observable } from 'rxjs';
+import { Course } from '../../generated/graphql';
 import { CourseService } from '../services';
+import { NewCourseInput } from '../type';
 
 @Component({
   selector: 'app-course-list',
@@ -12,6 +13,8 @@ import { CourseService } from '../services';
 export class CourseListComponent implements OnInit {
   courses: Course[] | undefined | null = [];
   languages$!: any;
+  errMsg$!: Observable<string>;
+  successMsg$!: Observable<string>;
 
   constructor(private service: CourseService,
               private cdr: ChangeDetectorRef) { }
@@ -26,6 +29,8 @@ export class CourseListComponent implements OnInit {
       });
 
     this.languages$ = this.service.getLanguages();
+    this.errMsg$ = this.service.errMsg$;
+    this.successMsg$ = this.service.successMsg$;
   }
 
   trackByFunc(index: number, course: Course): string {
@@ -34,13 +39,6 @@ export class CourseListComponent implements OnInit {
 
   submitNewCourse(newCourse: NewCourseInput): void {
     this.service.addCourse(newCourse)
-      .subscribe({
-        next: (addCourse: Course | undefined | null) => {
-          if (addCourse) {
-            alert(`${addCourse.name} is added.`);
-          }
-        },
-        error: (err: Error) => alert(err)
-      });
+      .subscribe();
   }
 }
