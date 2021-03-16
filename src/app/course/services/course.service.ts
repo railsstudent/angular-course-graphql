@@ -1,33 +1,24 @@
-import { CourseGQL, Language } from './../../generated/graphql';
 import { Injectable, OnDestroy } from '@angular/core';
 import { EMPTY, of, Subject } from 'rxjs';
 import { catchError, map, share, takeUntil, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { AllCoursesGQL, LanguagesGQL, AddCourseGQL, Course } from '../../generated/graphql';
+import { AllCoursesGQL, LanguagesGQL, AddCourseGQL, Course, CourseGQL, Language } from '../../generated/graphql';
 import { NewCourseInput } from '../type';
+import { AlertService } from './alert.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CourseService implements OnDestroy {
   private destroy$ = new Subject<boolean>();
-  private errMsgSub$ = new Subject<string>();
-  private successMsgSub$ = new Subject<string>();
-  errMsg$ = this.errMsgSub$.asObservable();
-  successMsg$ = this.successMsgSub$.asObservable();
-
   constructor(private allCoursesGQL: AllCoursesGQL,
               private languagesGQL: LanguagesGQL,
               private courseGQL: CourseGQL,
-              private addCourseGQL: AddCourseGQL) { }
-
-  clearMsgs(): void {
-    this.errMsgSub$.next('');
-    this.successMsgSub$.next('');
-  }
+              private addCourseGQL: AddCourseGQL,
+              private alertService: AlertService) { }
 
   addCourse(newCourse: NewCourseInput): any {
-    this.clearMsgs();
+    this.alertService.clearMsgs();
     return this.addCourseGQL.mutate({
       newCourse
     }, {
@@ -47,9 +38,9 @@ export class CourseService implements OnDestroy {
     })
     .pipe(
       map(({ data }) => data?.addCourse as Course),
-      tap((addCourse: Course) => this.successMsgSub$.next(`${addCourse.name} is added.`)),
+      tap((addCourse: Course) => this.alertService.setSuccess(`${addCourse.name} is added.`)),
       catchError((err: Error) => {
-        this.errMsgSub$.next(err.message);
+        this.alertService.setError(err.message);
         return EMPTY;
       })
     );
