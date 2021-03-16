@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { gql } from 'apollo-angular';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { AddSentenceGQL,
   AddSentenceInput,
@@ -10,7 +10,8 @@ import { AddSentenceGQL,
   Sentence,
   DeleteTranslationGQL,
   Lesson,
-  DeleteSentenceGQL
+  DeleteSentenceGQL,
+  Translation
 } from '../../generated/graphql';
 
 @Injectable({
@@ -24,19 +25,19 @@ export class SentenceService implements OnDestroy {
               private deleteTranslationGQL: DeleteTranslationGQL,
               private deleteSetenceGQL: DeleteSentenceGQL) { }
 
-  getTranslation(sentenceId: string, languageId: string): any {
+  getTranslation(sentenceId: string, languageId: string): Observable<Translation> {
     return this.translationGQL.watch({
       sentenceId,
       languageId
     }, {})
     .valueChanges
     .pipe(
-      map(({ data }) => data.getTranslation),
+      map(({ data }) => data.getTranslation as Translation),
       takeUntil(this.destroy$)
     );
   }
 
-  addSentence(lesson: Lesson, newSentence: AddSentenceInput): any {
+  addSentence(lesson: Lesson, newSentence: AddSentenceInput): Observable<Sentence> {
     return this.addSentenceGQL.mutate({
       newSentence
     }, {
@@ -69,12 +70,12 @@ export class SentenceService implements OnDestroy {
       }
     })
     .pipe(
-      map(({ data }) => data?.addSentence),
+      map(({ data }) => data?.addSentence as Sentence),
       takeUntil(this.destroy$)
     );
   }
 
-  deleteSentence(lesson: Lesson, sentenceId: string): any {
+  deleteSentence(lesson: Lesson, sentenceId: string): Observable<Sentence> {
     return this.deleteSetenceGQL.mutate({
       id: sentenceId
     }, {
@@ -100,12 +101,12 @@ export class SentenceService implements OnDestroy {
       }
     })
     .pipe(
-      map(({ data }) => data?.deleteSentence?.sentence),
+      map(({ data }) => data?.deleteSentence?.sentence as Sentence),
       takeUntil(this.destroy$)
     );
   }
 
-  addTranslate(sentence: Sentence, newTranslation: AddTranslationInput): any {
+  addTranslate(sentence: Sentence, newTranslation: AddTranslationInput): Observable<Translation> {
     return this.addTranslationGQL.mutate({
       newTranslation
     }, {
@@ -143,12 +144,12 @@ export class SentenceService implements OnDestroy {
       }
     })
     .pipe(
-      map(({ data }) => data?.addTranslation),
+      map(({ data }) => data?.addTranslation as Translation),
       takeUntil(this.destroy$)
     );
   }
 
-  deleteTranslate(sentence: Sentence, translationId: string): any {
+  deleteTranslate(sentence: Sentence, translationId: string): Observable<Translation> {
     return this.deleteTranslationGQL.mutate({
       id: translationId
     }, {
@@ -173,7 +174,7 @@ export class SentenceService implements OnDestroy {
       }
     })
     .pipe(
-      map(({ data }) => data?.deleteTranslation),
+      map(({ data }) => data?.deleteTranslation as Translation),
       takeUntil(this.destroy$)
     );
   }

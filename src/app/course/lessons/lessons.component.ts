@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { Course, Lesson } from '../../generated/graphql';
 import { NewLessonInput } from './../type';
 import { AlertService, CourseService, LessonService } from '../services';
@@ -13,10 +13,10 @@ import { AlertService, CourseService, LessonService } from '../services';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LessonsComponent implements OnInit {
-  course: Course | undefined | null = undefined;
-  lessons: Lesson[] | undefined | null = undefined;
   errMsg$!: Observable<string>;
   successMsg$!: Observable<string>;
+  course$!: Observable<Course | undefined>;
+  lessons$!: Observable<Lesson[]>;
 
   constructor(private route: ActivatedRoute,
               private courseService: CourseService,
@@ -25,19 +25,13 @@ export class LessonsComponent implements OnInit {
               private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    this.route.paramMap.pipe(
+    this.course$ = this.route.paramMap.pipe(
       switchMap(params => {
         const courseId = params.get('id');
-        return courseId ? this.courseService.getCourse(courseId) : undefined;
+        return courseId ? this.courseService.getCourse(courseId) : of (undefined);
       }),
-    ).subscribe({
-      next: (course: any) => {
-        this.course = course as Course;
-        this.lessons = course?.lessons || [];
-        this.cdr.markForCheck();
-      },
-      error: (err: Error) => alert(err.message),
-    });
+    );
+    this.lessons$ = this.course$.pipe(map(course => course?.lessons || []));
     this.errMsg$ = this.alertService.errMsg$;
     this.successMsg$ = this.alertService.successMsg$;
   }
@@ -46,12 +40,12 @@ export class LessonsComponent implements OnInit {
     return lesson.id;
   }
 
-  submitNewLesson(input: NewLessonInput): void {
+  submitNewLesson(course: Course, input: NewLessonInput): void {
     const { name } = input;
-    if (this.course) {
-      this.lessonService.addLesson(this.course, {
+    if (course) {
+      this.lessonService.addLesson(course, {
         name,
-        courseId: this.course.id
+        courseId: course.id
       })
       .subscribe();
     }

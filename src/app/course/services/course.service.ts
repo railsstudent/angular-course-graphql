@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { EMPTY, of, Subject } from 'rxjs';
+import { EMPTY, of, Subject, Observable } from 'rxjs';
 import { catchError, map, share, takeUntil, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { AllCoursesGQL, LanguagesGQL, AddCourseGQL, Course, CourseGQL, Language } from '../../generated/graphql';
@@ -17,7 +17,7 @@ export class CourseService implements OnDestroy {
               private addCourseGQL: AddCourseGQL,
               private alertService: AlertService) { }
 
-  addCourse(newCourse: NewCourseInput): any {
+  addCourse(newCourse: NewCourseInput): Observable<Course> {
     this.alertService.clearMsgs();
     return this.addCourseGQL.mutate({
       newCourse
@@ -47,7 +47,7 @@ export class CourseService implements OnDestroy {
     );
   }
 
-  getCourse(courseId: string): any {
+  getCourse(courseId: string): Observable<Course> {
     const args = {
       offset: 0,
       limit: 100,
@@ -61,12 +61,16 @@ export class CourseService implements OnDestroy {
     })
     .valueChanges
     .pipe(
-      map(({ data }) => data.course),
+      map(({ data }) => data.course as Course),
+      catchError(err => {
+        this.alertService.setError(err.message);
+        return EMPTY;
+      }),
       takeUntil(this.destroy$)
     );
   }
 
-  getLanguages(): any {
+  getLanguages(): Observable<Language[]> {
     return this.languagesGQL.watch({})
       .valueChanges
       .pipe(
@@ -80,11 +84,11 @@ export class CourseService implements OnDestroy {
       );
   }
 
-  getAllCourses(): any {
+  getAllCourses(): Observable<Course[]> {
     return this.allCoursesGQL.watch({}, { pollInterval: environment.pollingInterval })
       .valueChanges
       .pipe(
-        map(({ data }) => data.courses),
+        map(({ data }) => data.courses as Course[]),
         catchError(err => {
           console.error(err);
           return of([] as Course[]);

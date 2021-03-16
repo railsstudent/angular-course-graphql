@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { gql } from 'apollo-angular';
-import { EMPTY, Subject } from 'rxjs';
+import { EMPTY, Subject, Observable } from 'rxjs';
 import { catchError, map, takeUntil, tap } from 'rxjs/operators';
 import { AddLessonGQL, AddLessonInput, LessonGQL, Course, Lesson } from '../../generated/graphql';
 import { environment } from 'src/environments/environment';
@@ -14,7 +14,7 @@ export class LessonService implements OnDestroy {
 
   constructor(private addLessonGQL: AddLessonGQL, private lessonGQL: LessonGQL, private alertService: AlertService) { }
 
-  addLesson(course: Course, newLesson: AddLessonInput): any {
+  addLesson(course: Course, newLesson: AddLessonInput): Observable<Lesson> {
     this.alertService.clearMsgs();
     return this.addLessonGQL.mutate({
       newLesson
@@ -59,7 +59,7 @@ export class LessonService implements OnDestroy {
     );
   }
 
-  getLesson(lessonId: string): any {
+  getLesson(lessonId: string): Observable<Lesson> {
     return this.lessonGQL.watch({
       lessonId,
     }, {
@@ -67,7 +67,7 @@ export class LessonService implements OnDestroy {
     })
     .valueChanges
     .pipe(
-      map(({ data }) => data.lesson),
+      map(({ data }) => data.lesson as Lesson),
       takeUntil(this.destroy$)
     );
   }
