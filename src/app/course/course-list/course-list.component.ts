@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Course } from '../../generated/graphql';
+import { Course, Language } from '../../generated/graphql';
 import { CourseService, AlertService } from '../services';
 import { NewCourseInput } from '../type';
 
@@ -11,24 +11,16 @@ import { NewCourseInput } from '../type';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CourseListComponent implements OnInit {
-  courses: Course[] | undefined | null = [];
-  languages$!: any;
+  languages$!: Observable<Language[]>;
   errMsg$!: Observable<string>;
   successMsg$!: Observable<string>;
+  courses$!: Observable<Course[]>;
 
   constructor(private service: CourseService,
-              private alertService: AlertService,
-              private cdr: ChangeDetectorRef) { }
+              private alertService: AlertService) { }
 
   ngOnInit(): void {
-    this.service.getAllCourses()
-      .subscribe({
-        next: (courses: Course[]) => {
-          this.courses = courses;
-          this.cdr.markForCheck();
-        }
-      });
-
+    this.courses$ = this.service.getAllCourses();
     this.languages$ = this.service.getLanguages();
     this.errMsg$ = this.alertService.errMsg$;
     this.successMsg$ = this.alertService.successMsg$;

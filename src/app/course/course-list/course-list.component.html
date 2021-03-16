@@ -6,11 +6,13 @@
   <app-alert-success *ngIf="(successMsg$ | async) as msg">
     <span class="text-green-800">{{ msg }}</span>
   </app-alert-success>
-  <div class="course-list flex" *ngIf="courses else noCourse">
-    <div class="course-container" *ngFor="let course of courses; trackBy:trackByFunc">
-      <app-course-card class="course-card m-2" [course]="course"></app-course-card>
+  <ng-container *ngIf="(courses$ | async) as courses">
+    <div class="course-list flex" *ngIf="courses else noCourse">
+      <div class="course-container" *ngFor="let course of courses; trackBy:trackByFunc">
+        <app-course-card class="course-card m-2" [course]="course"></app-course-card>
+      </div>
     </div>
-  </div>
+  </ng-container>
 </div>
 <ng-template #noCourse>
   No course is found
