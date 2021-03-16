@@ -42,7 +42,8 @@ export class CourseService implements OnDestroy {
       catchError((err: Error) => {
         this.alertService.setError(err.message);
         return EMPTY;
-      })
+      }),
+      takeUntil(this.destroy$)
     );
   }
 

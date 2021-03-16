@@ -1,9 +1,10 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { gql } from 'apollo-angular';
-import { Subject } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
-import { AddLessonGQL, AddLessonInput, LessonGQL, CourseGQL, Course } from '../../generated/graphql';
+import { EMPTY, Subject } from 'rxjs';
+import { catchError, map, takeUntil, tap } from 'rxjs/operators';
+import { AddLessonGQL, AddLessonInput, LessonGQL, Course, Lesson } from '../../generated/graphql';
 import { environment } from 'src/environments/environment';
+import { AlertService } from './alert.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +12,10 @@ import { environment } from 'src/environments/environment';
 export class LessonService implements OnDestroy {
   private destroy$ = new Subject<boolean>();
 
-  constructor(private addLessonGQL: AddLessonGQL, private lessonGQL: LessonGQL, private courseGQL: CourseGQL) { }
+  constructor(private addLessonGQL: AddLessonGQL, private lessonGQL: LessonGQL, private alertService: AlertService) { }
 
   addLesson(course: Course, newLesson: AddLessonInput): any {
+    this.alertService.clearMsgs();
     return this.addLessonGQL.mutate({
       newLesson
     }, {
@@ -47,7 +49,12 @@ export class LessonService implements OnDestroy {
       }
     })
     .pipe(
-      map(({ data }) => data?.addLesson),
+      map(({ data }) => data?.addLesson as Lesson),
+      tap((addLesson: Lesson) => this.alertService.setSuccess(`${addLesson.name} is added.`)),
+      catchError((err: Error) => {
+        this.alertService.setError(err.message);
+        return EMPTY;
+      }),
       takeUntil(this.destroy$)
     );
   }

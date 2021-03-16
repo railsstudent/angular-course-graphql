@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { Course, Lesson } from '../../generated/graphql';
 import { NewLessonInput } from './../type';
-import { CourseService, LessonService } from '../services';
+import { AlertService, CourseService, LessonService } from '../services';
 
 @Component({
   selector: 'app-lessons',
@@ -14,10 +15,13 @@ import { CourseService, LessonService } from '../services';
 export class LessonsComponent implements OnInit {
   course: Course | undefined | null = undefined;
   lessons: Lesson[] | undefined | null = undefined;
+  errMsg$!: Observable<string>;
+  successMsg$!: Observable<string>;
 
   constructor(private route: ActivatedRoute,
               private courseService: CourseService,
               private lessonService: LessonService,
+              private alertService: AlertService,
               private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
@@ -32,8 +36,10 @@ export class LessonsComponent implements OnInit {
         this.lessons = course?.lessons || [];
         this.cdr.markForCheck();
       },
-      error: (err: Error) => alert(err),
+      error: (err: Error) => alert(err.message),
     });
+    this.errMsg$ = this.alertService.errMsg$;
+    this.successMsg$ = this.alertService.successMsg$;
   }
 
   trackByFunc(index: number, lesson: Lesson): string {
@@ -47,14 +53,7 @@ export class LessonsComponent implements OnInit {
         name,
         courseId: this.course.id
       })
-      .subscribe({
-        next: (addLesson: Lesson) => {
-          if (addLesson) {
-            alert(`${addLesson.name} is added.`);
-          }
-        },
-        error: (err: Error) => alert(err)
-      });
+      .subscribe();
     }
   }
 }
