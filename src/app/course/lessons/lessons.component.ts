@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
@@ -21,8 +21,7 @@ export class LessonsComponent implements OnInit {
   constructor(private route: ActivatedRoute,
               private courseService: CourseService,
               private lessonService: LessonService,
-              private alertService: AlertService,
-              private cdr: ChangeDetectorRef) { }
+              private alertService: AlertService) { }
 
   ngOnInit(): void {
     this.course$ = this.route.paramMap.pipe(
