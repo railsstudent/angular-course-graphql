@@ -1,14 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Subject, of } from 'rxjs';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Subject, of, Observable, BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { Language, Lesson, Sentence, Translation } from '../../generated/graphql';
 import { SentenceService } from '../services';
-import { tag } from 'rxjs-spy/operators/tag';
-import { create } from 'rxjs-spy';
-const spy = create();
-spy.log(/get-translation-.+/);
-spy.log('selected-translation');
-spy.log(/null-translation-.+/);
+// import { tag } from 'rxjs-spy/operators/tag';
+// import { create } from 'rxjs-spy';
+// const spy = create();
+// spy.log(/get-translation-.+/);
+// spy.log('selected-translation');
+// spy.log(/null-translation-.+/);
 
 @Component({
   selector: 'app-sentence',
@@ -33,13 +33,13 @@ export class SentenceComponent implements OnInit, OnDestroy {
   lesson: Lesson | undefined | null = null;
 
   destroy$ = new Subject<boolean>();
-  translate$ = new Subject<string | null>();
-  selectedTranslation: Translation | null = null;
+  translate$ = new BehaviorSubject<string | null>(null);
+  selectedTranslation$: Observable<Translation | null> | null = null;
 
-  constructor(private sentenceService: SentenceService, private cdr: ChangeDetectorRef) { }
+  constructor(private sentenceService: SentenceService) { }
 
   ngOnInit(): void {
-    this.translate$
+    this.selectedTranslation$ = this.translate$
       .pipe(
         distinctUntilChanged(),
         switchMap((languageId) => {
@@ -47,18 +47,12 @@ export class SentenceComponent implements OnInit, OnDestroy {
           if (!sentenceId || !languageId) {
             return of(null);
           }
-          return this.sentenceService.getTranslation(sentenceId, languageId)
-              .pipe(tag(`get-translation-${sentenceId}-${languageId}`));
+          return this.sentenceService.getTranslation(sentenceId, languageId);
+              // .pipe(tag(`get-translation-${sentenceId}-${languageId}`));
         }),
         takeUntil(this.destroy$),
-        tag('selected-translation')
-      ).subscribe({
-        next: (translation: any) => {
-          this.selectedTranslation = translation as Translation;
-          this.cdr.markForCheck();
-        },
-        error: (err) => alert(err)
-      });
+        // tag('selected-translation')
+      );
   }
 
   ngOnDestroy(): void {
