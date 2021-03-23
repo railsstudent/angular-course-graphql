@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject, of } from 'rxjs';
-import { distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { Language, Lesson, Sentence, Translation } from '../../generated/graphql';
 import { SentenceService } from '../services';
 import { tag } from 'rxjs-spy/operators/tag';
@@ -83,13 +83,8 @@ export class SentenceComponent implements OnInit, OnDestroy {
       }
 
       this.sentenceService.deleteTranslate(this.sentence, translationId)
-        .subscribe({
-          next: (translation: any) => {
-            this.translate$.next(null);
-            alert(`${translation.text} is deleted`);
-          },
-          error: (err: Error) => alert(err)
-        });
+        .pipe(tap(() => this.translate$.next(null)))
+        .subscribe();
     }
   }
 
