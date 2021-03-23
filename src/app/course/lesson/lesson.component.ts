@@ -1,9 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, EMPTY } from 'rxjs';
+import { combineLatest, EMPTY, Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { Lesson, Translation, Sentence, Language } from '../../generated/graphql';
-import { CourseService, LessonService, SentenceService } from '../services';
+import { AlertService, CourseService, LessonService, SentenceService } from '../services';
 import { NewSentenceInput, NewTranslationInput } from '../type';
 
 @Component({
@@ -16,15 +16,22 @@ export class LessonComponent implements OnInit {
   lesson: Lesson | null | undefined = undefined;
   selectedTranslation: Translation | undefined = undefined;
   languages: Language[] | undefined = undefined;
+  errMsg$!: Observable<string>;
+  successMsg$!: Observable<string>;
+  translationLanguages$!: Observable<Language[]>;
 
   constructor(private route: ActivatedRoute,
               private lessonService: LessonService,
               private sentenceService: SentenceService,
               private courseService: CourseService,
-              private cdr: ChangeDetectorRef) {
+              private cdr: ChangeDetectorRef,
+              private alertService: AlertService) {
   }
 
   ngOnInit(): void {
+    this.errMsg$ = this.alertService.errMsg$;
+    this.successMsg$ = this.alertService.successMsg$;
+
     const lesson$ = this.route.paramMap.pipe(
       switchMap(params => {
         const lessonId = params.get('lessonId');
@@ -41,7 +48,7 @@ export class LessonComponent implements OnInit {
           this.languages = language ? languages.filter((item: Language) => item.id !== language.id) : languages;
           this.cdr.markForCheck();
         },
-        error: (err) => alert(err)
+        error: (err: Error) => alert(err.message)
       });
   }
 
@@ -61,7 +68,7 @@ export class LessonComponent implements OnInit {
               alert(`${addSentence.text} is added.`);
             }
           },
-          error: (err: Error) => alert(err)
+          error: (err: Error) => alert(err.message)
         });
     }
   }
@@ -81,7 +88,7 @@ export class LessonComponent implements OnInit {
               alert(`${addTranslation.text} is added.`);
             }
           },
-          error: (err: Error) => alert(err)
+          error: (err: Error) => alert(err.message)
         });
     }
   }

@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { gql } from 'apollo-angular';
-import { Subject, Observable } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
+import { Subject, Observable, EMPTY } from 'rxjs';
+import { catchError, map, takeUntil, tap } from 'rxjs/operators';
 import { AddSentenceGQL,
   AddSentenceInput,
   AddTranslationInput,
@@ -13,6 +13,7 @@ import { AddSentenceGQL,
   DeleteSentenceGQL,
   Translation
 } from '../../generated/graphql';
+import { AlertService } from './alert.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,8 @@ export class SentenceService implements OnDestroy {
   constructor(private translationGQL: TranslationGQL, private addSentenceGQL: AddSentenceGQL,
               private addTranslationGQL: AddTranslationGQL,
               private deleteTranslationGQL: DeleteTranslationGQL,
-              private deleteSetenceGQL: DeleteSentenceGQL) { }
+              private deleteSetenceGQL: DeleteSentenceGQL,
+              private alertService: AlertService) { }
 
   getTranslation(sentenceId: string, languageId: string): Observable<Translation> {
     return this.translationGQL.watch({
@@ -33,11 +35,16 @@ export class SentenceService implements OnDestroy {
     .valueChanges
     .pipe(
       map(({ data }) => data.getTranslation as Translation),
+      catchError((err: Error) => {
+        this.alertService.setError(err.message);
+        return EMPTY;
+      }),
       takeUntil(this.destroy$)
     );
   }
 
   addSentence(lesson: Lesson, newSentence: AddSentenceInput): Observable<Sentence> {
+    this.alertService.clearMsgs();
     return this.addSentenceGQL.mutate({
       newSentence
     }, {
@@ -71,6 +78,11 @@ export class SentenceService implements OnDestroy {
     })
     .pipe(
       map(({ data }) => data?.addSentence as Sentence),
+      tap((addSentence: Sentence) => this.alertService.setSuccess(`${addSentence.text} is added.`)),
+      catchError((err: Error) => {
+        this.alertService.setError(err.message);
+        return EMPTY;
+      }),
       takeUntil(this.destroy$)
     );
   }

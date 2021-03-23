@@ -22,6 +22,12 @@
         (submitNewTranlsation)="submitNewTranslation($event)"
       ></app-add-translation>
     </div>
+    <app-alert-error *ngIf="(errMsg$ | async) as msg">
+      <span class="text-red-800">{{ msg }}</span>
+    </app-alert-error>
+    <app-alert-success *ngIf="(successMsg$ | async) as msg">
+      <span class="text-green-800">{{ msg }}</span>
+    </app-alert-success>
     <p class="title mb-4">Sentences</p>
     <div class="sentences" *ngIf="lesson && lesson.sentences && lesson.sentences.length > 0 else noSentence">
       <ng-container *ngFor="let sentence of lesson.sentences; index as i; trackBy:trackByFunc">
