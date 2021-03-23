@@ -104,11 +104,6 @@ export class SentenceComponent implements OnInit, OnDestroy {
     }
 
     this.sentenceService.deleteSentence(this.lesson, sentenceId)
-      .subscribe({
-        next: (sentence: any) => {
-          alert(`${sentence.text} is deleted`);
-        },
-        error: (err: Error) => alert(err)
-      });
+      .subscribe();
   }
 }
