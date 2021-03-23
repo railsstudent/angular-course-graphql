@@ -82,14 +82,7 @@ export class LessonComponent implements OnInit {
       }
       this.sentenceService
         .addTranslate(sentence, newInput)
-        .subscribe({
-          next: (addTranslation: Translation) => {
-            if (addTranslation) {
-              alert(`${addTranslation.text} is added.`);
-            }
-          },
-          error: (err: Error) => alert(err.message)
-        });
+        .subscribe();
     }
   }
 }

@@ -162,6 +162,11 @@ export class SentenceService implements OnDestroy {
     })
     .pipe(
       map(({ data }) => data?.addTranslation as Translation),
+      tap((addTranslation: Translation) => this.alertService.setSuccess(`${addTranslation.text} is added.`)),
+      catchError((err: Error) => {
+        this.alertService.setError(err.message);
+        return EMPTY;
+      }),
       takeUntil(this.destroy$)
     );
   }
