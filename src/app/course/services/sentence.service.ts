@@ -88,6 +88,7 @@ export class SentenceService implements OnDestroy {
   }
 
   deleteSentence(lesson: Lesson, sentenceId: string): Observable<Sentence> {
+    this.alertService.clearMsgs();
     return this.deleteSetenceGQL.mutate({
       id: sentenceId
     }, {
@@ -124,6 +125,7 @@ export class SentenceService implements OnDestroy {
   }
 
   addTranslate(sentence: Sentence, newTranslation: AddTranslationInput): Observable<Translation> {
+    this.alertService.clearMsgs();
     return this.addTranslationGQL.mutate({
       newTranslation
     }, {
@@ -172,6 +174,7 @@ export class SentenceService implements OnDestroy {
   }
 
   deleteTranslate(sentence: Sentence, translationId: string): Observable<Translation> {
+    this.alertService.clearMsgs();
     return this.deleteTranslationGQL.mutate({
       id: translationId
     }, {
