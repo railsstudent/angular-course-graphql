@@ -1,10 +1,15 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, EMPTY, Observable } from 'rxjs';
-import { map, pluck, switchMap } from 'rxjs/operators';
-import { Lesson, Translation, Sentence, Language } from '../../generated/graphql';
+import { map, pluck, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { Lesson, Sentence, Language } from '../../generated/graphql';
 import { AlertService, CourseService, LessonService, SentenceService } from '../services';
 import { NewSentenceInput, NewTranslationInput } from '../type';
+// import { tag } from 'rxjs-spy/operators/tag';
+// import { create } from 'rxjs-spy';
+// const spy = create();
+// spy.log('languages');
+// spy.log('lesson');
 
 @Component({
   selector: 'app-lesson',
@@ -13,18 +18,15 @@ import { NewSentenceInput, NewTranslationInput } from '../type';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LessonComponent implements OnInit {
-  selectedTranslation: Translation | undefined = undefined;
-  languages: Language[] | undefined = undefined;
   errMsg$!: Observable<string>;
   successMsg$!: Observable<string>;
-  translationLanguages$!: Observable<Language[]>;
   lesson$: Observable<Lesson> | null = null;
+  languages$: Observable<Language[]> | null = null;
 
   constructor(private route: ActivatedRoute,
               private lessonService: LessonService,
               private sentenceService: SentenceService,
               private courseService: CourseService,
-              private cdr: ChangeDetectorRef,
               private alertService: AlertService) {
   }
 
@@ -45,20 +47,18 @@ export class LessonComponent implements OnInit {
         map(([lesson, langs]) => ({
           lesson,
           langs
-        }))
+        })),
+        shareReplay(1)
       );
 
     this.lesson$ = lessonLangs$.pipe(pluck('lesson'));
-
-    lessonLangs$
-      .subscribe({
-        next: ({lesson, langs}: any) => {
-          const language = lesson?.course?.language;
-          this.languages = language ? langs.filter((item: Language) => item.id !== language.id) : langs;
-          this.cdr.markForCheck();
-        },
-        error: (err: Error) => alert(err.message)
-      });
+    this.languages$ = lessonLangs$.pipe(
+      map(({ lesson, langs }) => {
+        const langId = lesson?.course?.language?.id || '';
+        return langId ? langs.filter(lang => lang.id !== langId)  : langs;
+      }),
+      // tag(`languages`)
+    );
   }
 
   trackByFunc(index: number, sentence: Sentence): string {

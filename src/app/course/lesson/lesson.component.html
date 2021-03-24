@@ -17,7 +17,7 @@
         (submitNewSentence)="submitNewSentence(lesson, $event)"></app-add-sentence>
       <app-add-translation
         class="flex-grow flex-shrink"
-        [languages]="languages"
+        [languages]="languages$ | async"
         [sentences]="lesson?.sentences"
         (submitNewTranlsation)="submitNewTranslation(lesson, $event)"
       ></app-add-translation>
