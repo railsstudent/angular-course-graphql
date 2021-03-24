@@ -9,8 +9,7 @@ import { AlertService } from './alert.service';
 @Injectable({
   providedIn: 'root'
 })
-export class CourseService implements OnDestroy {
-  private destroy$ = new Subject<boolean>();
+export class CourseService {
   constructor(private allCoursesGQL: AllCoursesGQL,
               private languagesGQL: LanguagesGQL,
               private courseGQL: CourseGQL,
@@ -43,7 +42,6 @@ export class CourseService implements OnDestroy {
         this.alertService.setError(err.message);
         return EMPTY;
       }),
-      takeUntil(this.destroy$)
     );
   }
 
@@ -66,7 +64,6 @@ export class CourseService implements OnDestroy {
         this.alertService.setError(err.message);
         return EMPTY;
       }),
-      takeUntil(this.destroy$)
     );
   }
 
@@ -80,7 +77,6 @@ export class CourseService implements OnDestroy {
           return of([] as Language[]);
         }),
         share(),
-        takeUntil(this.destroy$)
       );
   }
 
@@ -93,12 +89,6 @@ export class CourseService implements OnDestroy {
           console.error(err);
           return of([] as Course[]);
         }),
-        takeUntil(this.destroy$)
       );
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.unsubscribe();
   }
 }

@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { Observable } from 'rxjs';
 import { Course, Language } from '../../generated/graphql';
 import { CourseService, AlertService } from '../services';
 import { NewCourseInput } from '../type';
 
+@UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'app-course-list',
   templateUrl: './course-list.component.html',

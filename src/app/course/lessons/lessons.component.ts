@@ -3,9 +3,11 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { Course, Lesson } from '../../generated/graphql';
-import { NewLessonInput } from './../type';
+import { NewLessonInput } from '../type';
 import { AlertService, CourseService, LessonService } from '../services';
+import { UntilDestroy } from '@ngneat/until-destroy';
 
+@UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'app-lessons',
   templateUrl: './lessons.component.html',

@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { combineLatest, EMPTY, Observable } from 'rxjs';
-import { map, pluck, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { map, pluck, shareReplay, switchMap } from 'rxjs/operators';
 import { Lesson, Sentence, Language } from '../../generated/graphql';
 import { AlertService, CourseService, LessonService, SentenceService } from '../services';
 import { NewSentenceInput, NewTranslationInput } from '../type';
@@ -11,6 +12,7 @@ import { NewSentenceInput, NewTranslationInput } from '../type';
 // spy.log('languages');
 // spy.log('lesson');
 
+@UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'app-lesson',
   templateUrl: './lesson.component.html',

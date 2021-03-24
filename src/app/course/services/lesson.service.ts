@@ -9,9 +9,7 @@ import { AlertService } from './alert.service';
 @Injectable({
   providedIn: 'root'
 })
-export class LessonService implements OnDestroy {
-  private destroy$ = new Subject<boolean>();
-
+export class LessonService {
   constructor(private addLessonGQL: AddLessonGQL, private lessonGQL: LessonGQL, private alertService: AlertService) { }
 
   addLesson(course: Course, newLesson: AddLessonInput): Observable<Lesson> {
@@ -55,7 +53,6 @@ export class LessonService implements OnDestroy {
         this.alertService.setError(err.message);
         return EMPTY;
       }),
-      takeUntil(this.destroy$)
     );
   }
 
@@ -68,12 +65,6 @@ export class LessonService implements OnDestroy {
     .valueChanges
     .pipe(
       map(({ data }) => data.lesson as Lesson),
-      takeUntil(this.destroy$)
     );
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.unsubscribe();
   }
 }

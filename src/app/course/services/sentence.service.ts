@@ -18,9 +18,7 @@ import { AlertService } from './alert.service';
 @Injectable({
   providedIn: 'root'
 })
-export class SentenceService implements OnDestroy {
-  private destroy$ = new Subject<boolean>();
-
+export class SentenceService {
   constructor(private translationGQL: TranslationGQL, private addSentenceGQL: AddSentenceGQL,
               private addTranslationGQL: AddTranslationGQL,
               private deleteTranslationGQL: DeleteTranslationGQL,
@@ -39,7 +37,6 @@ export class SentenceService implements OnDestroy {
         this.alertService.setError(err.message);
         return EMPTY;
       }),
-      takeUntil(this.destroy$)
     );
   }
 
@@ -83,7 +80,6 @@ export class SentenceService implements OnDestroy {
         this.alertService.setError(err.message);
         return EMPTY;
       }),
-      takeUntil(this.destroy$)
     );
   }
 
@@ -120,7 +116,6 @@ export class SentenceService implements OnDestroy {
         this.alertService.setError(err.message);
         return EMPTY;
       }),
-      takeUntil(this.destroy$)
     );
   }
 
@@ -169,7 +164,6 @@ export class SentenceService implements OnDestroy {
         this.alertService.setError(err.message);
         return EMPTY;
       }),
-      takeUntil(this.destroy$)
     );
   }
 
@@ -205,13 +199,6 @@ export class SentenceService implements OnDestroy {
         this.alertService.setError(err.message);
         return EMPTY;
       }),
-      takeUntil(this.destroy$)
     );
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.unsubscribe();
-    console.log('sentence service - ngOnDestroy fired');
   }
 }
