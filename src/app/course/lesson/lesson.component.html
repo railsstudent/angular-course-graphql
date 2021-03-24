@@ -1,4 +1,4 @@
-<div class="container font-sans">
+<div class="container font-sans" *ngIf="(lesson$ | async) as lesson">
   <div class="header p-2 flex justify-between items-center">
     <div class="back">
       <button [routerLink]="['../']" class="back">Back</button>
@@ -14,12 +14,12 @@
       <app-add-sentence
         class="mr-4 flex-grow flex-shrink"
         [language]="lesson?.course?.language"
-        (submitNewSentence)="submitNewSentence($event)"></app-add-sentence>
+        (submitNewSentence)="submitNewSentence(lesson, $event)"></app-add-sentence>
       <app-add-translation
         class="flex-grow flex-shrink"
         [languages]="languages"
         [sentences]="lesson?.sentences"
-        (submitNewTranlsation)="submitNewTranslation($event)"
+        (submitNewTranlsation)="submitNewTranslation(lesson, $event)"
       ></app-add-translation>
     </div>
     <app-alert-error *ngIf="(errMsg$ | async) as msg">

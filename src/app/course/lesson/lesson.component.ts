@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, EMPTY, Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { map, pluck, switchMap } from 'rxjs/operators';
 import { Lesson, Translation, Sentence, Language } from '../../generated/graphql';
 import { AlertService, CourseService, LessonService, SentenceService } from '../services';
 import { NewSentenceInput, NewTranslationInput } from '../type';
@@ -13,12 +13,12 @@ import { NewSentenceInput, NewTranslationInput } from '../type';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LessonComponent implements OnInit {
-  lesson: Lesson | null | undefined = undefined;
   selectedTranslation: Translation | undefined = undefined;
   languages: Language[] | undefined = undefined;
   errMsg$!: Observable<string>;
   successMsg$!: Observable<string>;
   translationLanguages$!: Observable<Language[]>;
+  lesson$: Observable<Lesson> | null = null;
 
   constructor(private route: ActivatedRoute,
               private lessonService: LessonService,
@@ -40,12 +40,21 @@ export class LessonComponent implements OnInit {
     );
     const langs$ = this.courseService.getLanguages();
 
-    combineLatest([lesson$, langs$])
+    const lessonLangs$ = combineLatest([lesson$, langs$])
+      .pipe(
+        map(([lesson, langs]) => ({
+          lesson,
+          langs
+        }))
+      );
+
+    this.lesson$ = lessonLangs$.pipe(pluck('lesson'));
+
+    lessonLangs$
       .subscribe({
-        next: ([lesson, languages]: any) => {
-          this.lesson = lesson as Lesson;
+        next: ({lesson, langs}: any) => {
           const language = lesson?.course?.language;
-          this.languages = language ? languages.filter((item: Language) => item.id !== language.id) : languages;
+          this.languages = language ? langs.filter((item: Language) => item.id !== language.id) : langs;
           this.cdr.markForCheck();
         },
         error: (err: Error) => alert(err.message)
@@ -56,19 +65,19 @@ export class LessonComponent implements OnInit {
     return sentence.id;
   }
 
-  submitNewSentence(newInput: NewSentenceInput): void {
+  submitNewSentence(lesson: Lesson, newInput: NewSentenceInput): void {
     const { text } = newInput;
 
-    if (this.lesson) {
+    if (lesson) {
       this.sentenceService
-        .addSentence(this.lesson, { text, lessonId: this.lesson.id })
+        .addSentence(lesson, { text, lessonId: lesson.id })
         .subscribe();
     }
   }
 
-  submitNewTranslation(newInput: NewTranslationInput): void {
-    if (newInput && this.lesson) {
-      const sentence = (this.lesson?.sentences || []).find(s => s.id === newInput.sentenceId);
+  submitNewTranslation(lesson: Lesson, newInput: NewTranslationInput): void {
+    if (newInput && lesson) {
+      const sentence = (lesson?.sentences || []).find(s => s.id === newInput.sentenceId);
       if (!sentence) {
         alert('Sentence does not exist');
         return;
