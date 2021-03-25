@@ -36,4 +36,8 @@ export class CourseListComponent implements OnInit {
     this.service.addCourse(newCourse)
       .subscribe();
   }
+
+  loadMore(): void {
+
+  }
 }
