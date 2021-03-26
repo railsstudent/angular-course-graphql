@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { Course, Language } from '../../generated/graphql';
 import { CourseService, AlertService } from '../services';
 import { NewCourseInput } from '../type';
@@ -17,6 +18,7 @@ export class CourseListComponent implements OnInit {
   errMsg$!: Observable<string>;
   successMsg$!: Observable<string>;
   courses$!: Observable<Course[]>;
+  offset = 0;
 
   constructor(private service: CourseService,
               private alertService: AlertService) { }
@@ -25,7 +27,9 @@ export class CourseListComponent implements OnInit {
     this.courses$ = this.service.getAllCourses({
       offset: 0,
       limit: 3
-    });
+    }).pipe(
+      tap(results => this.offset = results.length)
+    );
     this.languages$ = this.service.getLanguages();
     this.errMsg$ = this.alertService.errMsg$;
     this.successMsg$ = this.alertService.successMsg$;
@@ -41,6 +45,9 @@ export class CourseListComponent implements OnInit {
   }
 
   loadMore(): void {
-
+    this.service.fetchMoreCourses({
+      offset: this.offset,
+      limit: 3
+    });
   }
 }

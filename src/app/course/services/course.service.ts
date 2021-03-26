@@ -91,4 +91,19 @@ export class CourseService {
         }),
       );
   }
+
+  fetchMoreCourses(args: PaginationArgs) {
+    return this.allCoursesGQL.fetch({
+      args
+    }, {
+      // updateQuery: () => {
+      // }
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) { return prev; }
+        return Object.assign({}, prev, {
+          feed: [...prev.feed, ...fetchMoreResult.feed],
+        });
+      }
+    }).pipe()
+  }
 }
