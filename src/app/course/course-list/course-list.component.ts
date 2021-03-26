@@ -22,7 +22,10 @@ export class CourseListComponent implements OnInit {
               private alertService: AlertService) { }
 
   ngOnInit(): void {
-    this.courses$ = this.service.getAllCourses();
+    this.courses$ = this.service.getAllCourses({
+      offset: 0,
+      limit: 3
+    });
     this.languages$ = this.service.getLanguages();
     this.errMsg$ = this.alertService.errMsg$;
     this.successMsg$ = this.alertService.successMsg$;
