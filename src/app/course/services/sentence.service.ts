@@ -1,7 +1,7 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { gql } from 'apollo-angular';
-import { Subject, Observable, EMPTY } from 'rxjs';
-import { catchError, map, takeUntil, tap } from 'rxjs/operators';
+import { Observable, EMPTY } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 import { AddSentenceGQL,
   AddSentenceInput,
   AddTranslationInput,

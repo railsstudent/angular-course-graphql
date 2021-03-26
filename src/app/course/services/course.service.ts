@@ -1,8 +1,8 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { EMPTY, of, Subject, Observable } from 'rxjs';
-import { catchError, map, share, takeUntil, tap } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { EMPTY, of, Observable } from 'rxjs';
+import { catchError, map, share, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { AllCoursesGQL, LanguagesGQL, AddCourseGQL, Course, CourseGQL, Language } from '../../generated/graphql';
+import { AllCoursesGQL, LanguagesGQL, AddCourseGQL, Course, CourseGQL, Language, PaginationArgs } from '../../generated/graphql';
 import { NewCourseInput } from '../type';
 import { AlertService } from './alert.service';
 
@@ -80,8 +80,8 @@ export class CourseService {
       );
   }
 
-  getAllCourses(): Observable<Course[]> {
-    return this.allCoursesGQL.watch({}, { pollInterval: environment.pollingInterval })
+  getAllCourses(args: PaginationArgs): Observable<Course[]> {
+    return this.allCoursesGQL.watch({ args }, { pollInterval: environment.pollingInterval })
       .valueChanges
       .pipe(
         map(({ data }) => data.courses as Course[]),
