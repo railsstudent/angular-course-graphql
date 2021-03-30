@@ -12,7 +12,7 @@ import { NewSentenceInput, NewTranslationInput } from '../type';
 // spy.log('languages');
 // spy.log('lesson');
 
-@UntilDestroy({ checkProperties: true })
+@UntilDestroy({})
 @Component({
   selector: 'app-lesson',
   templateUrl: './lesson.component.html',

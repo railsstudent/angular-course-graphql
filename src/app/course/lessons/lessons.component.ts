@@ -7,7 +7,7 @@ import { NewLessonInput } from '../type';
 import { AlertService, CourseService, LessonService } from '../services';
 import { UntilDestroy } from '@ngneat/until-destroy';
 
-@UntilDestroy({ checkProperties: true })
+@UntilDestroy({})
 @Component({
   selector: 'app-lessons',
   templateUrl: './lessons.component.html',

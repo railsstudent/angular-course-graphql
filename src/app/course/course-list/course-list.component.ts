@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { UntilDestroy } from '@ngneat/until-destroy';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { Course, Language } from '../../generated/graphql';
-import { CourseService, AlertService } from '../services';
+import { QueryRef } from 'apollo-angular';
+import { Observable, of } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+import { Course, Language, AllCoursesQuery } from '../../generated/graphql';
+import { CourseService, AlertService, LIMIT } from '../services';
 import { NewCourseInput } from '../type';
 
-@UntilDestroy({ checkProperties: true })
+@UntilDestroy({})
 @Component({
   selector: 'app-course-list',
   templateUrl: './course-list.component.html',
@@ -18,18 +19,36 @@ export class CourseListComponent implements OnInit {
   errMsg$!: Observable<string>;
   successMsg$!: Observable<string>;
   courses$!: Observable<Course[]>;
-  offset = 0;
+  // offset = 0;
+  coursesQuery!: QueryRef<AllCoursesQuery>;
+  cursor = -1;
 
   constructor(private service: CourseService,
               private alertService: AlertService) { }
 
   ngOnInit(): void {
-    this.courses$ = this.service.getAllCourses({
-      offset: 0,
-      limit: 3
-    }).pipe(
-      tap(results => this.offset = results.length)
-    );
+    // this.courses$ = this.service.getAllCourses({
+    //   offset: 0,
+    //   limit: LIMIT
+    // }).pipe(
+    //   tap(results => this.offset = results.length)
+    // );
+
+    this.coursesQuery = this.service.getPaginatedCoursesQueryRef();
+
+    this.courses$ = this.coursesQuery
+      .valueChanges
+      .pipe(
+        map(({ data }) => data.courses),
+        tap(courses => this.cursor = courses?.cursor || -1),
+        map(courses => (courses?.courses || []) as Course[]),
+        catchError(err => {
+          console.error(err.message);
+          this.cursor = -1;
+          return of([] as Course[]);
+        }),
+      );
+
     this.languages$ = this.service.getLanguages();
     this.errMsg$ = this.alertService.errMsg$;
     this.successMsg$ = this.alertService.successMsg$;
@@ -45,9 +64,31 @@ export class CourseListComponent implements OnInit {
   }
 
   loadMore(): void {
-    this.service.fetchMoreCourses({
-      offset: this.offset,
-      limit: 3
+    this.coursesQuery.fetchMore({
+      variables: {
+        args: {
+          cursor: this.cursor,
+          limit: LIMIT
+        }
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) {
+          return prev;
+        }
+
+        const parents =  fetchMoreResult?.courses || undefined
+        const coures = parents?.courses || [] as Course[]
+        const prevCourses = prev?.courses?.courses || [] as Course[]
+
+        const allCourses = [...prevCourses, ...coures];
+        const uniqCourses = allCourses.filter((c, index, self) =>
+          self.map(s => s.name).indexOf(c.name) === index
+        );
+
+        return Object.assign({}, prev, {
+          courses: uniqCourses,
+        });
+      }
     });
   }
 }

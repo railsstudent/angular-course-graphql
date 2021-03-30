@@ -10,11 +10,14 @@ fragment CourseName on Course {
   description
 }
 
-query AllCourses ($args: PaginationArgs!) {
+query AllCourses ($args: CursorPaginationArgs!) {
   courses (args: $args) {
-    ...CourseName
-    language {
-      ...CourseLanguage
+    cursor
+    courses {
+      ...CourseName
+      language {
+        ...CourseLanguage
+      }
     }
   }
 }

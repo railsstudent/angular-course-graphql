@@ -11,7 +11,7 @@ import { SentenceService } from '../services';
 // spy.log('selected-translation');
 // spy.log(/null-translation-.+/);
 
-@UntilDestroy({ checkProperties: true })
+@UntilDestroy({})
 @Component({
   selector: 'app-sentence',
   templateUrl: './sentence.component.html',
