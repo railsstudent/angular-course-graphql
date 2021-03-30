@@ -76,8 +76,8 @@ export class CourseListComponent implements OnInit {
           return prev;
         }
 
-        const parents =  fetchMoreResult?.courses || undefined
-        const coures = parents?.courses || [] as Course[]
+        const fetchMoreCourses =  fetchMoreResult?.courses || undefined
+        const coures = fetchMoreCourses?.courses || [] as Course[]
         const prevCourses = prev?.courses?.courses || [] as Course[]
 
         const allCourses = [...prevCourses, ...coures];
