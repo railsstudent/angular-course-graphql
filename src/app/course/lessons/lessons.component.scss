@@ -20,11 +20,15 @@
 
   .main {
     p {
-      &.lesson:nth-child(even) {
+      &.lesson {
+        flex-basis: 50%;
+      }
+
+      &.lesson:nth-child(4n - 3), &.lesson:nth-child(4n - 2) {
         background: #ddd
       }
 
-      &.lesson:nth-child(odd) {
+      &.lesson:nth-child(4n - 1), &.lesson:nth-child(4n) {
         background: #dddf8d;
       }
     }

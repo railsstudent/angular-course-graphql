@@ -17,13 +17,13 @@
     <app-alert-success *ngIf="(successMsg$ | async) as msg">
       <span class="text-green-800">{{ msg }}</span>
     </app-alert-success>
-    <div class="flex m-2">
+    <div class="m-2 ml-0">
       <button (click)="loadMore(course)">Load More</button>
     </div>
     <p class="title mb-4">My Lessons</p>
     <ng-container *ngIf="(lessons$ | async) as lessons">
-      <div class="lessons" *ngIf="lessons && lessons.length > 0 else noLesson">
-        <p class="lesson p-1" *ngFor="let lesson of lessons; trackBy:trackByFunc">
+      <div class="flex flex-wrap" *ngIf="lessons && lessons.length > 0 else noLesson">
+        <p class="lesson p-1 flex-grow-0 flex-shrink" *ngFor="let lesson of lessons; trackBy:trackByFunc">
           <a class="text-lg" [routerLink]="[ lesson.id ]">{{ lesson.name }}</a>
         </p>
       </div>

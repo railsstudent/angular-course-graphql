@@ -89,4 +89,10 @@ export class LessonComponent implements OnInit {
         .subscribe();
     }
   }
+
+  loadMore(lesson: Lesson) {
+    if (lesson) {
+
+    }
+  }
 }

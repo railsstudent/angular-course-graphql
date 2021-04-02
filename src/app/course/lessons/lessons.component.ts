@@ -1,7 +1,8 @@
+import { PaginatedItems } from './../../generated/graphql';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { Course, Lesson } from '../../generated/graphql';
 import { NewLessonInput } from '../type';
 import { AlertService, CourseService, LessonService } from '../services';
@@ -19,6 +20,7 @@ export class LessonsComponent implements OnInit {
   successMsg$!: Observable<string>;
   course$!: Observable<Course | undefined>;
   lessons$!: Observable<Lesson[]>;
+  cursor = -1;
 
   constructor(private route: ActivatedRoute,
               private courseService: CourseService,
@@ -32,7 +34,9 @@ export class LessonsComponent implements OnInit {
         return courseId ? this.courseService.getCourse(courseId) : of (undefined);
       }),
     );
-    this.lessons$ = this.course$.pipe(map(course => course?.lessons || []));
+    this.lessons$ = this.course$.pipe(
+      tap(course => this.cursor = course?.paginatedLessons?.cursor || -1),
+      map(course => course?.paginatedLessons?.lessons || []));
     this.errMsg$ = this.alertService.errMsg$;
     this.successMsg$ = this.alertService.successMsg$;
   }
@@ -50,5 +54,10 @@ export class LessonsComponent implements OnInit {
       })
       .subscribe();
     }
+  }
+
+  loadMore(course: Course): void {
+    this.courseService.nextLessons({ courseId: course.id, cursor: this.cursor })
+      .subscribe();
   }
 }

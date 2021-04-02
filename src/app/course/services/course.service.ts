@@ -8,13 +8,13 @@ import { AllCoursesGQL, LanguagesGQL, AddCourseGQL, Course, CourseGQL, Language,
 import { NewCourseInput } from '../type';
 import { AlertService } from './alert.service';
 
-export const LIMIT = 2;
+export const COURSE_LIMIT = 4;
 const INIT_ARGS: CursorPaginationArgs = {
   cursor: -1,
-  limit: LIMIT
+  limit: COURSE_LIMIT
 };
 
-export const LESSON_LIMIT = 3;
+export const LESSON_LIMIT = 4;
 const INIT_LESSON_ARGS: CursorPaginationArgs = {
   cursor: -1,
   limit: LESSON_LIMIT

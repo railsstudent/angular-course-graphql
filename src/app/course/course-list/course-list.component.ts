@@ -4,7 +4,7 @@ import { QueryRef } from 'apollo-angular';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Course, Language, AllCoursesQuery } from '../../generated/graphql';
-import { CourseService, AlertService, LIMIT } from '../services';
+import { CourseService, AlertService, COURSE_LIMIT } from '../services';
 import { NewCourseInput } from '../type';
 
 @UntilDestroy({})
@@ -68,7 +68,7 @@ export class CourseListComponent implements OnInit {
       variables: {
         args: {
           cursor: this.cursor,
-          limit: LIMIT
+          limit: COURSE_LIMIT
         }
       },
       updateQuery: (prev, { fetchMoreResult }) => {

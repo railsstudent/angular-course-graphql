@@ -2,9 +2,15 @@ import { Injectable } from '@angular/core';
 import { gql } from 'apollo-angular';
 import { EMPTY, Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import { AddLessonGQL, AddLessonInput, LessonGQL, Course, Lesson } from '../../generated/graphql';
+import { AddLessonGQL, AddLessonInput, LessonGQL, Course, Lesson, CursorPaginationArgs } from '../../generated/graphql';
 import { environment } from 'src/environments/environment';
 import { AlertService } from './alert.service';
+
+export const SENTENCE_LIMIT = 3;
+const INIT_SENTENCE_ARGS: CursorPaginationArgs = {
+  cursor: -1,
+  limit: SENTENCE_LIMIT
+};
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +29,7 @@ export class LessonService {
         cache.modify({
           id: cache.identify(course),
           fields: {
-            lessons(existingLessonRefs = [], { readField }): any[] {
+            paginatedLessons(existingLessonRefs = { lessons: [], cursor: -1 }, { readField }): any[] {
               const newLessonRef = cache.writeFragment({
                 data: returnedLesson,
                 fragment: gql`
@@ -35,12 +41,15 @@ export class LessonService {
               });
               // Quick safety check - if the new lesson is already
               // present in the cache, we don't need to add it again.
-              if (returnedLesson && existingLessonRefs.some(
+              if (returnedLesson && existingLessonRefs.lessons.some(
                 (ref: any) => readField('id', ref) === returnedLesson.id
               )) {
                 return existingLessonRefs;
               }
-              return [...existingLessonRefs, newLessonRef];
+              return {
+                ...existingLessonRefs,
+                lessons: [...existingLessonRefs.lessons, newLessonRef]
+              };
             }
           }
         });
@@ -56,15 +65,16 @@ export class LessonService {
     );
   }
 
-  getLesson(lessonId: string): Observable<Lesson> {
+  getLesson(lessonId: string, args: CursorPaginationArgs = INIT_SENTENCE_ARGS): Observable<Lesson> {
     return this.lessonGQL.watch({
       lessonId,
+      args
     }, {
       pollInterval: environment.pollingInterval
     })
     .valueChanges
     .pipe(
-      map(({ data }) => data.lesson as Lesson),
+      map(({ data }) => data.getLesson as Lesson),
     );
   }
 }
