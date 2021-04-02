@@ -51,12 +51,13 @@ export type Course = {
   language?: Maybe<Language>;
   lessons?: Maybe<Array<Lesson>>;
   name?: Maybe<Scalars['String']>;
+  paginatedLessons?: Maybe<PaginatedItems>;
 };
 
 
 /** Course model */
-export type CourseLessonsArgs = {
-  args: PaginationArgs;
+export type CoursePaginatedLessonsArgs = {
+  args: CursorPaginationArgs;
 };
 
 export type CursorPaginationArgs = {
@@ -86,7 +87,14 @@ export type Lesson = {
   course?: Maybe<Course>;
   id: Scalars['ID'];
   name?: Maybe<Scalars['String']>;
+  paginatedSentences?: Maybe<PaginatedItems>;
   sentences?: Maybe<Array<Sentence>>;
+};
+
+
+/** Lesson model */
+export type LessonPaginatedSentencesArgs = {
+  args: CursorPaginationArgs;
 };
 
 export type Mutation = {
@@ -98,6 +106,8 @@ export type Mutation = {
   addTranslation: Translation;
   deleteSentence: DeletedSentence;
   deleteTranslation: Translation;
+  nextLessons: PaginatedItems;
+  nextSentences: PaginatedItems;
   updateCourse: Course;
   updateLanguage: Language;
   updateLesson: Lesson;
@@ -140,6 +150,18 @@ export type MutationDeleteTranslationArgs = {
 };
 
 
+export type MutationNextLessonsArgs = {
+  args: CursorPaginationArgs;
+  courseId: Scalars['String'];
+};
+
+
+export type MutationNextSentencesArgs = {
+  args: CursorPaginationArgs;
+  lessonId: Scalars['String'];
+};
+
+
 export type MutationUpdateCourseArgs = {
   course: UpdateCourseInput;
 };
@@ -159,17 +181,13 @@ export type MutationUpdateSentenceArgs = {
   updateSentence: UpdateSentenceInput;
 };
 
-/** Cursor-based pagination of courses/sentences */
+/** Cursor-based pagination of courses/lessons/sentences */
 export type PaginatedItems = {
   __typename?: 'PaginatedItems';
   courses?: Maybe<Array<Course>>;
   cursor?: Maybe<Scalars['Float']>;
+  lessons?: Maybe<Array<Lesson>>;
   sentences?: Maybe<Array<Sentence>>;
-};
-
-export type PaginationArgs = {
-  limit?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
 };
 
 export type Query = {
@@ -177,9 +195,9 @@ export type Query = {
   course?: Maybe<Course>;
   courses?: Maybe<PaginatedItems>;
   getLanguages: Array<Language>;
+  getLesson?: Maybe<Lesson>;
   getSentence: Sentence;
   getTranslation: Translation;
-  lesson?: Maybe<Lesson>;
 };
 
 
@@ -193,6 +211,11 @@ export type QueryCoursesArgs = {
 };
 
 
+export type QueryGetLessonArgs = {
+  id?: Maybe<Scalars['String']>;
+};
+
+
 export type QueryGetSentenceArgs = {
   id?: Maybe<Scalars['String']>;
 };
@@ -201,11 +224,6 @@ export type QueryGetSentenceArgs = {
 export type QueryGetTranslationArgs = {
   languageId: Scalars['String'];
   sentenceId: Scalars['String'];
-};
-
-
-export type QueryLessonArgs = {
-  id?: Maybe<Scalars['String']>;
 };
 
 /** Sentence model */
@@ -285,7 +303,7 @@ export type AllCoursesQuery = (
 
 export type CourseQueryVariables = Exact<{
   courseId: Scalars['String'];
-  args: PaginationArgs;
+  args: CursorPaginationArgs;
 }>;
 
 
@@ -296,10 +314,14 @@ export type CourseQuery = (
     & { language?: Maybe<(
       { __typename?: 'Language' }
       & CourseLanguageFragment
-    )>, lessons?: Maybe<Array<(
-      { __typename?: 'Lesson' }
-      & Pick<Lesson, 'id' | 'name'>
-    )>> }
+    )>, paginatedLessons?: Maybe<(
+      { __typename?: 'PaginatedItems' }
+      & Pick<PaginatedItems, 'cursor'>
+      & { lessons?: Maybe<Array<(
+        { __typename?: 'Lesson' }
+        & Pick<Lesson, 'id' | 'name'>
+      )>> }
+    )> }
     & CourseNameFragment
   )> }
 );
@@ -349,12 +371,13 @@ export type SentenceTextFragment = (
 
 export type LessonQueryVariables = Exact<{
   lessonId: Scalars['String'];
+  args: CursorPaginationArgs;
 }>;
 
 
 export type LessonQuery = (
   { __typename?: 'Query' }
-  & { lesson?: Maybe<(
+  & { getLesson?: Maybe<(
     { __typename?: 'Lesson' }
     & { course?: Maybe<(
       { __typename?: 'Course' }
@@ -363,14 +386,18 @@ export type LessonQuery = (
         & CourseLanguageFragment
       )> }
       & CourseNameFragment
-    )>, sentences?: Maybe<Array<(
-      { __typename?: 'Sentence' }
-      & Pick<Sentence, 'id' | 'text'>
-      & { availableTranslations?: Maybe<Array<(
-        { __typename?: 'Language' }
-        & Pick<Language, 'id' | 'name'>
+    )>, paginatedSentences?: Maybe<(
+      { __typename?: 'PaginatedItems' }
+      & Pick<PaginatedItems, 'cursor'>
+      & { sentences?: Maybe<Array<(
+        { __typename?: 'Sentence' }
+        & Pick<Sentence, 'id' | 'text'>
+        & { availableTranslations?: Maybe<Array<(
+          { __typename?: 'Language' }
+          & Pick<Language, 'id' | 'name'>
+        )>> }
       )>> }
-    )>> }
+    )> }
     & LessonNameFragment
   )> }
 );
@@ -385,6 +412,24 @@ export type AddLessonMutation = (
   & { addLesson: (
     { __typename?: 'Lesson' }
     & LessonNameFragment
+  ) }
+);
+
+export type NextLessonsMutationVariables = Exact<{
+  courseId: Scalars['String'];
+  args: CursorPaginationArgs;
+}>;
+
+
+export type NextLessonsMutation = (
+  { __typename?: 'Mutation' }
+  & { nextLessons: (
+    { __typename?: 'PaginatedItems' }
+    & Pick<PaginatedItems, 'cursor'>
+    & { lessons?: Maybe<Array<(
+      { __typename?: 'Lesson' }
+      & LessonNameFragment
+    )>> }
   ) }
 );
 
@@ -416,6 +461,28 @@ export type DeleteSentenceMutation = (
     )>, translations?: Maybe<Array<(
       { __typename?: 'Translation' }
       & TranslationTextFragment
+    )>> }
+  ) }
+);
+
+export type NextSentencesMutationVariables = Exact<{
+  id: Scalars['String'];
+  args: CursorPaginationArgs;
+}>;
+
+
+export type NextSentencesMutation = (
+  { __typename?: 'Mutation' }
+  & { nextSentences: (
+    { __typename?: 'PaginatedItems' }
+    & Pick<PaginatedItems, 'cursor'>
+    & { sentences?: Maybe<Array<(
+      { __typename?: 'Sentence' }
+      & Pick<Sentence, 'id' | 'text'>
+      & { availableTranslations?: Maybe<Array<(
+        { __typename?: 'Language' }
+        & Pick<Language, 'id' | 'name'>
+      )>> }
     )>> }
   ) }
 );
@@ -530,15 +597,18 @@ ${CourseLanguageFragmentDoc}`;
     }
   }
 export const CourseDocument = gql`
-    query Course($courseId: String!, $args: PaginationArgs!) {
+    query Course($courseId: String!, $args: CursorPaginationArgs!) {
   course(id: $courseId) {
     ...CourseName
     language {
       ...CourseLanguage
     }
-    lessons(args: $args) {
-      id
-      name
+    paginatedLessons(args: $args) {
+      cursor
+      lessons {
+        id
+        name
+      }
     }
   }
 }
@@ -596,8 +666,8 @@ ${CourseLanguageFragmentDoc}`;
     }
   }
 export const LessonDocument = gql`
-    query Lesson($lessonId: String!) {
-  lesson(id: $lessonId) {
+    query Lesson($lessonId: String!, $args: CursorPaginationArgs!) {
+  getLesson(id: $lessonId) {
     ...LessonName
     course {
       ...CourseName
@@ -605,12 +675,15 @@ export const LessonDocument = gql`
         ...CourseLanguage
       }
     }
-    sentences {
-      id
-      text
-      availableTranslations {
+    paginatedSentences(args: $args) {
+      cursor
+      sentences {
         id
-        name
+        text
+        availableTranslations {
+          id
+          name
+        }
       }
     }
   }
@@ -642,6 +715,27 @@ export const AddLessonDocument = gql`
   })
   export class AddLessonGQL extends Apollo.Mutation<AddLessonMutation, AddLessonMutationVariables> {
     document = AddLessonDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const NextLessonsDocument = gql`
+    mutation nextLessons($courseId: String!, $args: CursorPaginationArgs!) {
+  nextLessons(courseId: $courseId, args: $args) {
+    cursor
+    lessons {
+      ...LessonName
+    }
+  }
+}
+    ${LessonNameFragmentDoc}`;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class NextLessonsGQL extends Apollo.Mutation<NextLessonsMutation, NextLessonsMutationVariables> {
+    document = NextLessonsDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
@@ -684,6 +778,32 @@ ${TranslationTextFragmentDoc}`;
   })
   export class DeleteSentenceGQL extends Apollo.Mutation<DeleteSentenceMutation, DeleteSentenceMutationVariables> {
     document = DeleteSentenceDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const NextSentencesDocument = gql`
+    mutation nextSentences($id: String!, $args: CursorPaginationArgs!) {
+  nextSentences(lessonId: $id, args: $args) {
+    cursor
+    sentences {
+      id
+      text
+      availableTranslations {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class NextSentencesGQL extends Apollo.Mutation<NextSentencesMutation, NextSentencesMutationVariables> {
+    document = NextSentencesDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

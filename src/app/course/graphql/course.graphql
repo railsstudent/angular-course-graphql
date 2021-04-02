@@ -22,15 +22,18 @@ query AllCourses ($args: CursorPaginationArgs!) {
   }
 }
 
-query Course ($courseId: String!, $args: PaginationArgs!) {
+query Course ($courseId: String!, $args: CursorPaginationArgs!) {
   course(id: $courseId) {
     ...CourseName
     language {
       ...CourseLanguage
     }
-    lessons (args: $args) {
-      id
-      name
+    paginatedLessons (args: $args) {
+      cursor
+      lessons {
+        id
+        name
+      }
     }
   }
 }

@@ -4,7 +4,7 @@ import { EMPTY, of, Observable } from 'rxjs';
 import { catchError, map, share, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { AllCoursesGQL, LanguagesGQL, AddCourseGQL, Course, CourseGQL, Language, AllCoursesDocument,
-  AllCoursesQuery, CursorPaginationArgs } from '../../generated/graphql';
+  AllCoursesQuery, CursorPaginationArgs, NextLessonsGQL, Lesson, PaginatedItems } from '../../generated/graphql';
 import { NewCourseInput } from '../type';
 import { AlertService } from './alert.service';
 
@@ -12,6 +12,12 @@ export const LIMIT = 2;
 const INIT_ARGS: CursorPaginationArgs = {
   cursor: -1,
   limit: LIMIT
+};
+
+export const LESSON_LIMIT = 3;
+const INIT_LESSON_ARGS: CursorPaginationArgs = {
+  cursor: -1,
+  limit: LESSON_LIMIT
 };
 
 @Injectable({
@@ -22,6 +28,7 @@ export class CourseService {
               private languagesGQL: LanguagesGQL,
               private courseGQL: CourseGQL,
               private addCourseGQL: AddCourseGQL,
+              private nextLessonGQL: NextLessonsGQL,
               private alertService: AlertService,
               private apollo: Apollo) { }
 
@@ -39,9 +46,13 @@ export class CourseService {
             args: INIT_ARGS
           }
         };
-        const { courses: existingCourses = [] }: any = cache.readQuery(queryOptions);
 
-        const courses = existingCourses ? [...existingCourses, returnedCourse] : [returnedCourse];
+        const { courses: cacheCourses = null }: any = cache.readQuery(queryOptions);
+        const { cursor = -1, courses: existingCourses = [] } = cacheCourses;
+        const courses = {
+          cursor,
+          courses: existingCourses ? [...existingCourses, returnedCourse] : [returnedCourse]
+        };
         cache.writeQuery({
           ...queryOptions,
           data: { courses }
@@ -59,14 +70,9 @@ export class CourseService {
   }
 
   getCourse(courseId: string): Observable<Course> {
-    const args = {
-      offset: 0,
-      limit: 100,
-    };
-
     return this.courseGQL.watch({
       courseId,
-      args
+      args: INIT_LESSON_ARGS
     }, {
       pollInterval: environment.pollingInterval
     })
@@ -112,5 +118,36 @@ export class CourseService {
         args: INIT_ARGS,
       },
     });
+  }
+
+  nextLessons(courseId: string, args: CursorPaginationArgs): Observable<PaginatedItems> {
+    this.alertService.clearMsgs();
+    return this.nextLessonGQL.mutate({
+      courseId,
+      args
+    }, {
+      update: (cache, {data}) => {
+        const query = this.courseGQL.document;
+        const nextLessons = (data?.nextLessons || []) as Lesson[];
+        const queryOptions = {
+          query,
+          variables: {
+            courseId,
+            args: INIT_LESSON_ARGS
+          }
+        };
+        const { paginatedLessons: prevPaginatedLessons = [] }: any = cache.readQuery(queryOptions);
+
+        const paginatedLessons = prevPaginatedLessons ? [...prevPaginatedLessons, ...nextLessons] : [...nextLessons];
+        cache.writeQuery({
+          ...queryOptions,
+          data: { paginatedLessons }
+        });
+      }
+    })
+    .pipe(
+      map(({ data }) => data?.nextLessons as PaginatedItems),
+      catchError((err: Error) => EMPTY),
+    );
   }
 }
