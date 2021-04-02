@@ -50,7 +50,7 @@ export class SentenceService {
         cache.modify({
           id: cache.identify(lesson),
           fields: {
-            sentences(existingSentenceRefs = [], { readField }): any[] {
+            paginatedSentences(existingSentenceRefs = { cursor: -1, sentences: [] }, { readField }): any[] {
               const newSentenceRef = cache.writeFragment({
                 data: returnedSentence,
                 fragment: gql`
@@ -62,12 +62,15 @@ export class SentenceService {
               });
               // Quick safety check - if the new sentence is already
               // present in the cache, we don't need to add it again.
-              if (returnedSentence && existingSentenceRefs.some(
+              if (returnedSentence && existingSentenceRefs.sentences.some(
                 (ref: any) => readField('id', ref) === returnedSentence.id
               )) {
                 return existingSentenceRefs;
               }
-              return [...existingSentenceRefs, newSentenceRef];
+              return {
+                ...existingSentenceRefs,
+                sentences: [...existingSentenceRefs.sentences, newSentenceRef]
+              };
             }
           }
         });
@@ -95,8 +98,8 @@ export class SentenceService {
         cache.modify({
           id: cache.identify(lesson),
           fields: {
-            sentences(existingSentenceRefs = [], { readField }): any[] {
-              return existingSentenceRefs.filter((ref: any) => sentence?.id !== readField('id', ref));
+            paginatedSentences(existingSentenceRefs = { cursor: -1, sentences: [] }, { readField }): any[] {
+              return existingSentenceRefs.sentences.filter((ref: any) => sentence?.id !== readField('id', ref));
             }
           }
         });
