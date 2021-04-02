@@ -47,8 +47,8 @@ export class CourseService {
           }
         };
 
-        const { courses: cacheCourses = null }: any = cache.readQuery(queryOptions);
-        const { cursor = -1, courses: existingCourses = [] } = cacheCourses;
+        const { courses: cachedCourses = null }: any = cache.readQuery(queryOptions);
+        const { cursor = -1, courses: existingCourses = [] } = cachedCourses;
         const courses = {
           cursor,
           courses: existingCourses ? [...existingCourses, returnedCourse] : [returnedCourse]
@@ -120,15 +120,21 @@ export class CourseService {
     });
   }
 
-  nextLessons(courseId: string, args: CursorPaginationArgs): Observable<PaginatedItems> {
+  nextLessons(input: { courseId: string, cursor: number}): Observable<PaginatedItems> {
     this.alertService.clearMsgs();
+    const { courseId, cursor } = input;
+    const args: CursorPaginationArgs = {
+      cursor,
+      limit: LESSON_LIMIT
+    };
     return this.nextLessonGQL.mutate({
       courseId,
       args
     }, {
       update: (cache, {data}) => {
         const query = this.courseGQL.document;
-        const nextLessons = (data?.nextLessons || []) as Lesson[];
+        const nextLessons = data?.nextLessons as PaginatedItems;
+        const { cursor: nextCursor = -1, lessons: newLessons = [] } = nextLessons || {};
         const queryOptions = {
           query,
           variables: {
@@ -136,12 +142,29 @@ export class CourseService {
             args: INIT_LESSON_ARGS
           }
         };
-        const { paginatedLessons: prevPaginatedLessons = [] }: any = cache.readQuery(queryOptions);
+        const { course: cachedCourse = null }: any = cache.readQuery(queryOptions);
+        const { paginatedLessons: prevPaginatedLessons = null } = cachedCourse;
+        const { lessons: prevLessons = [] } = prevPaginatedLessons;
+        const lessons = newLessons as Lesson[];
 
-        const paginatedLessons = prevPaginatedLessons ? [...prevPaginatedLessons, ...nextLessons] : [...nextLessons];
+        const concatLessons = prevLessons ? [...prevLessons, ...lessons] : [...lessons];
+        const uniqLessons = concatLessons.filter((c, index, self) =>
+          self.map(s => s.id).indexOf(c.id) === index
+        );
+
+        const paginatedLessons = {
+          cursor: nextCursor as number,
+          lessons: uniqLessons
+        };
+
+        const course = {
+          ...cachedCourse,
+          paginatedLessons
+        };
+
         cache.writeQuery({
           ...queryOptions,
-          data: { paginatedLessons }
+          data: { course }
         });
       }
     })

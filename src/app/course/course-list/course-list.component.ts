@@ -76,18 +76,22 @@ export class CourseListComponent implements OnInit {
           return prev;
         }
 
-        const fetchMoreCourses =  fetchMoreResult?.courses || undefined
-        const coures = fetchMoreCourses?.courses || [] as Course[]
-        const prevCourses = prev?.courses?.courses || [] as Course[]
+        const fetchMoreCourses =  fetchMoreResult?.courses || undefined;
+        const courses = fetchMoreCourses?.courses || [] as Course[];
+        const prevCourses: Course[] = prev?.courses?.courses || [];
 
-        const allCourses = [...prevCourses, ...coures];
+        const allCourses = [...prevCourses, ...courses];
         const uniqCourses = allCourses.filter((c, index, self) =>
-          self.map(s => s.name).indexOf(c.name) === index
+          self.map(s => s.id).indexOf(c.id) === index
         );
 
-        return Object.assign({}, prev, {
-          courses: uniqCourses,
-        });
+        return {
+          ...prev,
+          courses: {
+            cursor: fetchMoreCourses?.cursor || -1,
+            courses: uniqCourses
+          }
+        };
       }
     });
   }

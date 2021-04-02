@@ -5,10 +5,12 @@
       <span class="field">Language:</span>
       <span>{{ language?.fullname }}</span>
     </label>
-    <label class="label">
-      <span class="field">Name:</span>
-      <input style="width: 80%;" name="name" type="text" formControlName="name" required maxlength="50" size="50">
-    </label>
-    <button class="self-start m-2 disabled:opacity-50" [disabled]="!form.valid">Add</button>
+    <div>
+      <label class="label">
+        <span class="field">Name:</span>
+        <input style="width: 80%;" name="name" type="text" formControlName="name" required maxlength="50" size="50">
+      </label>
+      <button class="self-start m-2 disabled:opacity-50" [disabled]="!form.valid">Add</button>
+    </div>
   </form>
 </div>
