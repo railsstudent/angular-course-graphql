@@ -22,6 +22,7 @@ export class CourseListComponent implements OnInit {
   // offset = 0;
   coursesQuery!: QueryRef<AllCoursesQuery>;
   cursor = -1;
+  loading = false;
 
   constructor(private service: CourseService,
               private alertService: AlertService) { }
@@ -64,6 +65,7 @@ export class CourseListComponent implements OnInit {
   }
 
   loadMore(): void {
+    this.loading = true;
     this.coursesQuery.fetchMore({
       variables: {
         args: {
@@ -93,6 +95,9 @@ export class CourseListComponent implements OnInit {
           }
         };
       }
-    });
+    })
+    .finally(
+      () => this.loading = false
+    );
   }
 }

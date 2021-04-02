@@ -2,7 +2,7 @@ import { PaginatedItems } from './../../generated/graphql';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { finalize, map, switchMap, tap } from 'rxjs/operators';
 import { Course, Lesson } from '../../generated/graphql';
 import { NewLessonInput } from '../type';
 import { AlertService, CourseService, LessonService } from '../services';
@@ -21,6 +21,7 @@ export class LessonsComponent implements OnInit {
   course$!: Observable<Course | undefined>;
   lessons$!: Observable<Lesson[]>;
   cursor = -1;
+  loading = false;
 
   constructor(private route: ActivatedRoute,
               private courseService: CourseService,
@@ -57,7 +58,14 @@ export class LessonsComponent implements OnInit {
   }
 
   loadMore(course: Course): void {
-    this.courseService.nextLessons({ courseId: course.id, cursor: this.cursor })
-      .subscribe();
+    if (course) {
+      this.loading = true;
+      this.courseService
+        .nextLessons({ courseId: course.id, cursor: this.cursor })
+        .pipe(
+          finalize(() => this.loading = false)
+        )
+        .subscribe();
+    }
   }
 }
