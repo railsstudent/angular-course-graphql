@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { combineLatest, EMPTY, Observable } from 'rxjs';
-import { map, pluck, shareReplay, switchMap } from 'rxjs/operators';
+import { map, pluck, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { Lesson, Sentence, Language } from '../../generated/graphql';
 import { AlertService, CourseService, LessonService, SentenceService } from '../services';
 import { NewSentenceInput, NewTranslationInput } from '../type';
@@ -24,6 +24,7 @@ export class LessonComponent implements OnInit {
   successMsg$!: Observable<string>;
   lesson$: Observable<Lesson> | null = null;
   languages$: Observable<Language[]> | null = null;
+  cursor = -1;
 
   constructor(private route: ActivatedRoute,
               private lessonService: LessonService,
@@ -53,7 +54,10 @@ export class LessonComponent implements OnInit {
         shareReplay(1)
       );
 
-    this.lesson$ = lessonLangs$.pipe(pluck('lesson'));
+    this.lesson$ = lessonLangs$.pipe(
+      pluck('lesson'),
+      tap(({ paginatedSentences }: Lesson) => this.cursor = paginatedSentences?.cursor || -1),
+    );
     this.languages$ = lessonLangs$.pipe(
       map(({ lesson, langs }) => {
         const langId = lesson?.course?.language?.id || '';
@@ -90,9 +94,11 @@ export class LessonComponent implements OnInit {
     }
   }
 
-  loadMore(lesson: Lesson) {
+  loadMore(lesson: Lesson): void {
     if (lesson) {
-
+      this.lessonService
+        .nextSentences({ lessonId: lesson.id, cursor: this.cursor })
+        .subscribe();
     }
   }
 }

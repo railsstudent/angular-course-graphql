@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { gql } from 'apollo-angular';
 import { EMPTY, Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import { AddLessonGQL, AddLessonInput, LessonGQL, Course, Lesson, CursorPaginationArgs } from '../../generated/graphql';
+import { AddLessonGQL, AddLessonInput, LessonGQL, Course, Lesson, CursorPaginationArgs, NextSentencesGQL, PaginatedItems, Sentence } from '../../generated/graphql';
 import { environment } from 'src/environments/environment';
 import { AlertService } from './alert.service';
 
-export const SENTENCE_LIMIT = 3;
+const SENTENCE_LIMIT = 3;
 const INIT_SENTENCE_ARGS: CursorPaginationArgs = {
   cursor: -1,
   limit: SENTENCE_LIMIT
@@ -16,7 +16,9 @@ const INIT_SENTENCE_ARGS: CursorPaginationArgs = {
   providedIn: 'root'
 })
 export class LessonService {
-  constructor(private addLessonGQL: AddLessonGQL, private lessonGQL: LessonGQL, private alertService: AlertService) { }
+  constructor(private addLessonGQL: AddLessonGQL, private lessonGQL: LessonGQL,
+              private nextSentencesGQL: NextSentencesGQL,
+              private alertService: AlertService) { }
 
   addLesson(course: Course, newLesson: AddLessonInput): Observable<Lesson> {
     this.alertService.clearMsgs();
@@ -75,6 +77,60 @@ export class LessonService {
     .valueChanges
     .pipe(
       map(({ data }) => data.getLesson as Lesson),
+    );
+  }
+
+  nextSentences(input: { lessonId: string, cursor: number}): Observable<PaginatedItems> {
+    this.alertService.clearMsgs();
+    const { lessonId, cursor } = input;
+    const args: CursorPaginationArgs = {
+      cursor,
+      limit: SENTENCE_LIMIT
+    };
+    return this.nextSentencesGQL.mutate({
+      id: lessonId,
+      args
+    }, {
+      update: (cache, { data }) => {
+        const query = this.lessonGQL.document;
+        const nextSentences = data?.nextSentences as PaginatedItems;
+        const { cursor: nextCursor = -1, sentences: newSentences = [] } = nextSentences || {};
+        const queryOptions = {
+          query,
+          variables: {
+            lessonId,
+            args: INIT_SENTENCE_ARGS
+          }
+        };
+        const { getLesson: cachedLesson = null }: any = cache.readQuery(queryOptions);
+        const { paginatedSentences: prevPaginatedSentences = null } = cachedLesson;
+        const { sentences: prevSentences = [] } = prevPaginatedSentences;
+        const sentences = newSentences as Sentence[];
+
+        const concatSentences = prevSentences ? [...prevSentences, ...sentences] : [...sentences];
+        const uniqSentences = concatSentences.filter((c, index, self) =>
+          self.map(s => s.id).indexOf(c.id) === index
+        );
+
+        const paginatedSentences = {
+          cursor: nextCursor as number,
+          sentences: uniqSentences
+        };
+
+        const getLesson = {
+          ...cachedLesson,
+          paginatedSentences
+        };
+
+        cache.writeQuery({
+          ...queryOptions,
+          data: { getLesson }
+        });
+      }
+    })
+    .pipe(
+      map(({ data }) => data?.nextSentences as PaginatedItems),
+      catchError((err: Error) => EMPTY),
     );
   }
 }

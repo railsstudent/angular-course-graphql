@@ -29,9 +29,9 @@
       <span class="text-green-800">{{ msg }}</span>
     </app-alert-success>
     <div class="m-2 ml-0">
+      <span class="title mb-4 mr-4">Sentences</span>
       <button (click)="loadMore(lesson)">Load More</button>
     </div>
-    <p class="title mb-4">Sentences</p>
     <div class="sentences"
       *ngIf="lesson && lesson.paginatedSentences && lesson.paginatedSentences.sentences && lesson.paginatedSentences.sentences.length > 0 else noSentence">
       <ng-container *ngFor="let sentence of lesson.paginatedSentences.sentences; index as i; trackBy:trackByFunc">

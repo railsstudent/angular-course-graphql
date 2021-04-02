@@ -18,9 +18,9 @@
       <span class="text-green-800">{{ msg }}</span>
     </app-alert-success>
     <div class="m-2 ml-0">
+      <span class="title mb-4 mr-4">My Lessons</span>
       <button (click)="loadMore(course)">Load More</button>
     </div>
-    <p class="title mb-4">My Lessons</p>
     <ng-container *ngIf="(lessons$ | async) as lessons">
       <div class="flex flex-wrap" *ngIf="lessons && lessons.length > 0 else noLesson">
         <p class="lesson p-1 flex-grow-0 flex-shrink" *ngFor="let lesson of lessons; trackBy:trackByFunc">
