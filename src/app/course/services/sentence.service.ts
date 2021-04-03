@@ -69,7 +69,7 @@ export class SentenceService {
               }
               return {
                 ...existingSentenceRefs,
-                sentences: [...existingSentenceRefs.sentences, newSentenceRef]
+                paginatedSentences: [...existingSentenceRefs.sentences, newSentenceRef]
               };
             }
           }
