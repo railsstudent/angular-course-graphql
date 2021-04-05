@@ -8,7 +8,28 @@ const uri = environment.graphqlUrl; // <-- add the URL of the GraphQL server her
 export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
   return {
     link: httpLink.create({uri}),
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      typePolicies: {
+        Course: {
+          fields: {
+            paginatedLessons: {
+              merge(existing: any, incoming: any, { mergeObjects }): any {
+                return mergeObjects(existing, incoming);
+              },
+            },
+          },
+        },
+        Lesson: {
+          fields: {
+            paginatedSentences: {
+              merge(existing: any, incoming: any, { mergeObjects }): any {
+                return mergeObjects(existing, incoming);
+              },
+            }
+          }
+        }
+      }
+    }),
   };
 }
 
