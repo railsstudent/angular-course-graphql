@@ -37,8 +37,7 @@ query Lesson ($lessonId: String!, $args: CursorPaginationArgs!)  {
     paginatedSentences(args: $args) {
       cursor
       sentences {
-        id
-        text
+        ...SentenceText
         availableTranslations {
           id
           name
@@ -89,8 +88,7 @@ mutation deleteSentence ($id: String!) {
   nextSentences (lessonId: $id, args: $args) {
     cursor
     sentences {
-      id
-      text
+      ...SentenceText
       availableTranslations {
         id
         name
