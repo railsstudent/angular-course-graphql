@@ -69,8 +69,8 @@ export class SentenceService {
               }
               return {
                 ...existingSentenceRefs,
-                paginatedSentences: [...existingSentenceRefs.sentences, newSentenceRef]
-              };
+                sentences: [...existingSentenceRefs.sentences, newSentenceRef]
+              }
             }
           }
         });
@@ -99,7 +99,12 @@ export class SentenceService {
           id: cache.identify(lesson),
           fields: {
             paginatedSentences(existingSentenceRefs = { cursor: -1, sentences: [] }, { readField }): any[] {
-              return existingSentenceRefs.sentences.filter((ref: any) => sentence?.id !== readField('id', ref));
+              const sentences = existingSentenceRefs.sentences
+              const filteredSentences = sentences.filter((ref: any) => sentence?.id !== readField('id', ref));
+              return {
+                ...existingSentenceRefs,
+                sentences: filteredSentences
+              }
             }
           }
         });
