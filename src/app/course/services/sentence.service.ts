@@ -138,7 +138,7 @@ export class SentenceService {
           id: cache.identify(sentence),
           fields: {
             availableTranslations(existingLanguageRefs = [], { readField }): any[] {
-              const newLanguageRef = cache.writeFragment({
+              const newAvailableLangRef = cache.writeFragment({
                 data: returnedTranslation,
                 fragment: gql`
                   fragment NewLanguage on Language {
@@ -154,12 +154,7 @@ export class SentenceService {
               )) {
                 return existingLanguageRefs;
               }
-              return [...existingLanguageRefs, newLanguageRef]
-                .sort((a, b) => {
-                  const aName = a.name || '';
-                  const bName = b.name || '';
-                  return aName.localeCompare(bName);
-                });
+              return [...existingLanguageRefs, newAvailableLangRef];
             }
           }
         });
