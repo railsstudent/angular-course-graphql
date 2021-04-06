@@ -73,28 +73,6 @@ export class CourseListComponent implements OnInit {
           limit: COURSE_LIMIT
         }
       },
-      updateQuery: (prev, { fetchMoreResult }) => {
-        if (!fetchMoreResult) {
-          return prev;
-        }
-
-        const fetchMoreCourses =  fetchMoreResult?.courses || undefined;
-        const courses = fetchMoreCourses?.courses || [] as Course[];
-        const prevCourses: Course[] = prev?.courses?.courses || [];
-
-        const allCourses = [...prevCourses, ...courses];
-        const uniqCourses = allCourses.filter((c, index, self) =>
-          self.map(s => s.id).indexOf(c.id) === index
-        );
-
-        return {
-          ...prev,
-          courses: {
-            cursor: fetchMoreCourses?.cursor || -1,
-            courses: uniqCourses
-          }
-        };
-      }
     })
     .finally(
       () => this.loading = false
