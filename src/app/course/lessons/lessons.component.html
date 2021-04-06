@@ -19,7 +19,11 @@
     </app-alert-success>
     <div class="m-2 ml-0">
       <span class="title mb-4 mr-4">My Lessons</span>
-      <button class="disabled:opacity-50 hover:bg-blue-500" (click)="loadMore(course)" [disabled]="false">Load More</button>
+      <app-load-more-button [classNames]="'disabled:opacity-50 hover:bg-blue-500'"
+        [callbackFunction]="loadMore.bind(this)"
+        [someArg]="course"
+        [loading]="loading">
+      </app-load-more-button>
     </div>
     <ng-container *ngIf="(lessons$ | async) as lessons">
       <div class="flex flex-wrap" *ngIf="lessons && lessons.length > 0 else noLesson">
