@@ -1,4 +1,3 @@
-import { PaginatedItems } from './../../generated/graphql';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, of } from 'rxjs';
