@@ -34,7 +34,6 @@ export class SentenceComponent implements OnInit {
   @Input()
   lesson: Lesson | undefined | null = null;
 
-  destroy$ = new Subject<boolean>();
   translate$ = new BehaviorSubject<string | null>(null);
   selectedTranslation$: Observable<Translation | null> | null = null;
 
