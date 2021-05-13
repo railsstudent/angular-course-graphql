@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { combineLatest, EMPTY, Observable } from 'rxjs';
@@ -31,7 +31,8 @@ export class LessonComponent implements OnInit {
               private lessonService: LessonService,
               private sentenceService: SentenceService,
               private courseService: CourseService,
-              private alertService: AlertService) {
+              private alertService: AlertService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
@@ -101,7 +102,10 @@ export class LessonComponent implements OnInit {
       this.lessonService
         .nextSentences({ lessonId: lesson.id, cursor: this.cursor })
         .pipe(
-          finalize(() => this.loading = false)
+          finalize(() => {
+            this.loading = false;
+            this.cdr.markForCheck();
+          })
         )
         .subscribe();
     }

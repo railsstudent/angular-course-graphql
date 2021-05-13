@@ -8,7 +8,7 @@
   </app-alert-success>
   <ng-container *ngIf="(courses$ | async) as courses">
     <div class="flex m-2">
-      <app-load-more-button [classNames]="'disabled:opacity-50 hover:bg-blue-500'"
+      <app-load-more-button [color]="'blue'"
         [callbackFunction]="loadMore.bind(this)"
         [loading]="loading">
       </app-load-more-button>
