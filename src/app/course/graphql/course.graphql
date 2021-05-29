@@ -2,6 +2,8 @@ fragment CourseLanguage on Language {
   id
   name
   fullname
+  flag
+  shinyFlag
 }
 
 fragment CourseName on Course {
