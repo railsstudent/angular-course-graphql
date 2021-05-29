@@ -23,8 +23,10 @@ export type AddCourseInput = {
 };
 
 export type AddLanguageInput = {
+  flag?: Maybe<Scalars['String']>;
   name: Scalars['String'];
   nativeName: Scalars['String'];
+  shinyFlag?: Maybe<Scalars['String']>;
 };
 
 export type AddLessonInput = {
@@ -75,10 +77,12 @@ export type DeletedSentence = {
 /** Language model */
 export type Language = {
   __typename?: 'Language';
+  flag?: Maybe<Scalars['String']>;
   fullname?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name?: Maybe<Scalars['String']>;
   nativeName?: Maybe<Scalars['String']>;
+  shinyFlag?: Maybe<Scalars['String']>;
 };
 
 /** Lesson model */
@@ -196,8 +200,8 @@ export type Query = {
   courses?: Maybe<PaginatedItems>;
   getLanguages: Array<Language>;
   getLesson?: Maybe<Lesson>;
-  getSentence: Sentence;
-  getTranslation: Translation;
+  getSentence?: Maybe<Sentence>;
+  getTranslation?: Maybe<Translation>;
 };
 
 
@@ -253,9 +257,11 @@ export type UpdateCourseInput = {
 };
 
 export type UpdateLanguageInput = {
+  flag?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name?: Maybe<Scalars['String']>;
   nativeName?: Maybe<Scalars['String']>;
+  shinyFlag?: Maybe<Scalars['String']>;
 };
 
 export type UpdateLessonInput = {
@@ -272,12 +278,27 @@ export type UpdateSentenceInput = {
 
 export type CourseLanguageFragment = (
   { __typename?: 'Language' }
-  & Pick<Language, 'id' | 'name' | 'fullname'>
+  & Pick<Language, 'id' | 'name' | 'fullname' | 'flag' | 'shinyFlag'>
 );
 
 export type CourseNameFragment = (
   { __typename?: 'Course' }
   & Pick<Course, 'id' | 'name' | 'description'>
+);
+
+export type LessonNameFragment = (
+  { __typename?: 'Lesson' }
+  & Pick<Lesson, 'id' | 'name'>
+);
+
+export type TranslationTextFragment = (
+  { __typename?: 'Translation' }
+  & Pick<Translation, 'id' | 'text'>
+);
+
+export type SentenceTextFragment = (
+  { __typename?: 'Sentence' }
+  & Pick<Sentence, 'id' | 'text'>
 );
 
 export type AllCoursesQueryVariables = Exact<{
@@ -352,21 +373,6 @@ export type AddCourseMutation = (
     )> }
     & CourseNameFragment
   ) }
-);
-
-export type LessonNameFragment = (
-  { __typename?: 'Lesson' }
-  & Pick<Lesson, 'id' | 'name'>
-);
-
-export type TranslationTextFragment = (
-  { __typename?: 'Translation' }
-  & Pick<Translation, 'id' | 'text'>
-);
-
-export type SentenceTextFragment = (
-  { __typename?: 'Sentence' }
-  & Pick<Sentence, 'id' | 'text'>
 );
 
 export type LessonQueryVariables = Exact<{
@@ -516,14 +522,14 @@ export type TranslationQueryVariables = Exact<{
 
 export type TranslationQuery = (
   { __typename?: 'Query' }
-  & { getTranslation: (
+  & { getTranslation?: Maybe<(
     { __typename?: 'Translation' }
     & { language?: Maybe<(
       { __typename?: 'Language' }
       & CourseLanguageFragment
     )> }
     & TranslationTextFragment
-  ) }
+  )> }
 );
 
 export type DeleteTranslationMutationVariables = Exact<{
@@ -548,6 +554,8 @@ export const CourseLanguageFragmentDoc = gql`
   id
   name
   fullname
+  flag
+  shinyFlag
 }
     `;
 export const CourseNameFragmentDoc = gql`
@@ -590,12 +598,12 @@ export const AllCoursesDocument = gql`
     ${CourseNameFragmentDoc}
 ${CourseLanguageFragmentDoc}`;
 
-@Injectable({
+  @Injectable({
     providedIn: 'root'
   })
   export class AllCoursesGQL extends Apollo.Query<AllCoursesQuery, AllCoursesQueryVariables> {
     document = AllCoursesDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -619,12 +627,12 @@ export const CourseDocument = gql`
     ${CourseNameFragmentDoc}
 ${CourseLanguageFragmentDoc}`;
 
-@Injectable({
+  @Injectable({
     providedIn: 'root'
   })
   export class CourseGQL extends Apollo.Query<CourseQuery, CourseQueryVariables> {
     document = CourseDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -637,12 +645,12 @@ export const LanguagesDocument = gql`
 }
     ${CourseLanguageFragmentDoc}`;
 
-@Injectable({
+  @Injectable({
     providedIn: 'root'
   })
   export class LanguagesGQL extends Apollo.Query<LanguagesQuery, LanguagesQueryVariables> {
     document = LanguagesDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -659,12 +667,12 @@ export const AddCourseDocument = gql`
     ${CourseNameFragmentDoc}
 ${CourseLanguageFragmentDoc}`;
 
-@Injectable({
+  @Injectable({
     providedIn: 'root'
   })
   export class AddCourseGQL extends Apollo.Mutation<AddCourseMutation, AddCourseMutationVariables> {
     document = AddCourseDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -696,12 +704,12 @@ ${CourseNameFragmentDoc}
 ${CourseLanguageFragmentDoc}
 ${SentenceTextFragmentDoc}`;
 
-@Injectable({
+  @Injectable({
     providedIn: 'root'
   })
   export class LessonGQL extends Apollo.Query<LessonQuery, LessonQueryVariables> {
     document = LessonDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -714,12 +722,12 @@ export const AddLessonDocument = gql`
 }
     ${LessonNameFragmentDoc}`;
 
-@Injectable({
+  @Injectable({
     providedIn: 'root'
   })
   export class AddLessonGQL extends Apollo.Mutation<AddLessonMutation, AddLessonMutationVariables> {
     document = AddLessonDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -735,12 +743,12 @@ export const NextLessonsDocument = gql`
 }
     ${LessonNameFragmentDoc}`;
 
-@Injectable({
+  @Injectable({
     providedIn: 'root'
   })
   export class NextLessonsGQL extends Apollo.Mutation<NextLessonsMutation, NextLessonsMutationVariables> {
     document = NextLessonsDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -757,12 +765,12 @@ export const AddSentenceDocument = gql`
 }
     ${SentenceTextFragmentDoc}`;
 
-@Injectable({
+  @Injectable({
     providedIn: 'root'
   })
   export class AddSentenceGQL extends Apollo.Mutation<AddSentenceMutation, AddSentenceMutationVariables> {
     document = AddSentenceDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -781,12 +789,12 @@ export const DeleteSentenceDocument = gql`
     ${SentenceTextFragmentDoc}
 ${TranslationTextFragmentDoc}`;
 
-@Injectable({
+  @Injectable({
     providedIn: 'root'
   })
   export class DeleteSentenceGQL extends Apollo.Mutation<DeleteSentenceMutation, DeleteSentenceMutationVariables> {
     document = DeleteSentenceDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -806,12 +814,12 @@ export const NextSentencesDocument = gql`
 }
     ${SentenceTextFragmentDoc}`;
 
-@Injectable({
+  @Injectable({
     providedIn: 'root'
   })
   export class NextSentencesGQL extends Apollo.Mutation<NextSentencesMutation, NextSentencesMutationVariables> {
     document = NextSentencesDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -828,12 +836,12 @@ export const AddTranslationDocument = gql`
     ${TranslationTextFragmentDoc}
 ${CourseLanguageFragmentDoc}`;
 
-@Injectable({
+  @Injectable({
     providedIn: 'root'
   })
   export class AddTranslationGQL extends Apollo.Mutation<AddTranslationMutation, AddTranslationMutationVariables> {
     document = AddTranslationDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -850,12 +858,12 @@ export const TranslationDocument = gql`
     ${TranslationTextFragmentDoc}
 ${CourseLanguageFragmentDoc}`;
 
-@Injectable({
+  @Injectable({
     providedIn: 'root'
   })
   export class TranslationGQL extends Apollo.Query<TranslationQuery, TranslationQueryVariables> {
     document = TranslationDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -872,12 +880,12 @@ export const DeleteTranslationDocument = gql`
     ${TranslationTextFragmentDoc}
 ${CourseLanguageFragmentDoc}`;
 
-@Injectable({
+  @Injectable({
     providedIn: 'root'
   })
   export class DeleteTranslationGQL extends Apollo.Mutation<DeleteTranslationMutation, DeleteTranslationMutationVariables> {
     document = DeleteTranslationDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
