@@ -8,6 +8,7 @@
     </p>
     <p>
       <span class="field">Language: </span><span>{{ course?.language?.fullname }}</span>
+      <img *ngIf="course?.language?.flag" [src]="course?.language?.flag" [alt]="course?.name + ' flag'" />
     </p>
   </div>
   <p class="actions">
